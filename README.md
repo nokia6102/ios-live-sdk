@@ -24,6 +24,8 @@
 #### pod 安装方法：
 
  `pod 'UPLiveSDK'`
+
+__注: 如果使用 pod 安装, 只需要设置 ```Enable bitcode```： NO , 不需要添加依赖库.__
 	
 #### 常规安装方法：
 
