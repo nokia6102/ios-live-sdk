@@ -273,6 +273,8 @@
 		1EE859931D6C524700F7D777 /* UPAVCapturer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EE8587F1D6C524700F7D777 /* UPAVCapturer.m */; };
 		1EE859941D6C524700F7D777 /* UPLiveSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EE858801D6C524700F7D777 /* UPLiveSDK.framework */; };
 		1EF6AD411CEEEFFE004A7DCA /* UPLivePlayerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1EF6AD3F1CEEEFFE004A7DCA /* UPLivePlayerVC.xib */; };
+		AE3AD4591D93B7790088BF9D /* UPAudioGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = AE3AD4581D93B7790088BF9D /* UPAudioGraph.m */; };
+		AE3AD45B1D93B89A0088BF9D /* upyun_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = AE3AD45A1D93B89A0088BF9D /* upyun_logo.png */; };
 		AE721F851CE9655C000B170A /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE721F841CE9655C000B170A /* CoreMedia.framework */; };
 		AE721F871CE96567000B170A /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE721F861CE96567000B170A /* CoreVideo.framework */; };
 		AEB817A11D0F956100F97E66 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AEB817A01D0F956100F97E66 /* CoreTelephony.framework */; };
@@ -756,6 +758,9 @@
 		1EE8587F1D6C524700F7D777 /* UPAVCapturer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPAVCapturer.m; sourceTree = "<group>"; };
 		1EE858801D6C524700F7D777 /* UPLiveSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UPLiveSDK.framework; sourceTree = "<group>"; };
 		1EF6AD3F1CEEEFFE004A7DCA /* UPLivePlayerVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UPLivePlayerVC.xib; sourceTree = "<group>"; };
+		AE3AD4571D93B7790088BF9D /* UPAudioGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPAudioGraph.h; sourceTree = "<group>"; };
+		AE3AD4581D93B7790088BF9D /* UPAudioGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPAudioGraph.m; sourceTree = "<group>"; };
+		AE3AD45A1D93B89A0088BF9D /* upyun_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upyun_logo.png; sourceTree = "<group>"; };
 		AE721F841CE9655C000B170A /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		AE721F861CE96567000B170A /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		AEB817A01D0F956100F97E66 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
@@ -826,6 +831,7 @@
 		1EA2241E1CD9CC46007BF4B4 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AE3AD45A1D93B89A0088BF9D /* upyun_logo.png */,
 				1EA2241F1CD9CC46007BF4B4 /* main.m */,
 			);
 			name = "Supporting Files";
@@ -1229,6 +1235,8 @@
 		1EE8581E1D6C524700F7D777 /* Class */ = {
 			isa = PBXGroup;
 			children = (
+				AE3AD4571D93B7790088BF9D /* UPAudioGraph.h */,
+				AE3AD4581D93B7790088BF9D /* UPAudioGraph.m */,
 				1EE8581F1D6C524700F7D777 /* focus.png */,
 				1EE858201D6C524700F7D777 /* UPAudioCapture.h */,
 				1EE858211D6C524700F7D777 /* UPAudioCapture.m */,
@@ -1480,6 +1488,7 @@
 				1EE859551D6C524700F7D777 /* amaroMap.png in Resources */,
 				1EE859571D6C524700F7D777 /* brannanBlowout.png in Resources */,
 				1EE8595A1D6C524700F7D777 /* brannanProcess.png in Resources */,
+				AE3AD45B1D93B89A0088BF9D /* upyun_logo.png in Resources */,
 				1EE8596C1D6C524700F7D777 /* riseMap.png in Resources */,
 				1EE859581D6C524700F7D777 /* brannanContrast.png in Resources */,
 				1EE859671D6C524700F7D777 /* inkwellMap.png in Resources */,
@@ -1656,6 +1665,7 @@
 				1EE859181D6C524700F7D777 /* GPUImageToneCurveFilter.m in Sources */,
 				1EE858921D6C524700F7D777 /* GPUImageChromaKeyFilter.m in Sources */,
 				1EE858941D6C524700F7D777 /* GPUImageColorBlendFilter.m in Sources */,
+				AE3AD4591D93B7790088BF9D /* UPAudioGraph.m in Sources */,
 				1EE858D21D6C524700F7D777 /* GPUImageLineGenerator.m in Sources */,
 				1EE858D11D6C524700F7D777 /* GPUImageLinearBurnBlendFilter.m in Sources */,
 				1EE859231D6C524700F7D777 /* GPUImageVignetteFilter.m in Sources */,

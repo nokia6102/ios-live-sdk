@@ -27,6 +27,8 @@
 
 @property (nonatomic, assign) CGFloat lastScale;
 
+@property (nonatomic, assign) NSInteger filterCode;
+
 @end
 
 @implementation UPLiveStreamerLivingVC
@@ -95,16 +97,11 @@
     [[UPAVCapturer sharedInstance] stop];
     [UPAVCapturer sharedInstance].capturerPresetLevel = _settings.level;
     [UPAVCapturer sharedInstance].camaraPosition = _settings.camaraPosition;
-    [UPAVCapturer sharedInstance].streamingOn = _settings.streamingOn;
-    [UPAVCapturer sharedInstance].filterOn = _settings.filter;
     [UPAVCapturer sharedInstance].camaraTorchOn = _settings.camaraTorchOn;
     [UPAVCapturer sharedInstance].videoOrientation = _settings.videoOrientation;
     [UPAVCapturer sharedInstance].fps = _settings.fps;
     
-    
 //    [[UPAVCapturer sharedInstance] setFilterName:UPCustomFilter1977];
-    
-    
     //推流地址
     NSString *rtmpPushUrl = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
     
@@ -118,30 +115,118 @@
     rtmpPushUrl = [NSString stringWithFormat:@"%@?_upt=%@", rtmpPushUrl, upToken];
     NSLog(@"rtmpPushUrl: %@", rtmpPushUrl);
     [UPAVCapturer sharedInstance].outStreamPath = rtmpPushUrl;
+    /// 要调节成 16:9 的比例, 可以自行调整要裁剪的大小
     
-    [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGRectMake(0, 0, 360, 640);
-    if ([UPAVCapturer sharedInstance].videoOrientation == AVCaptureVideoOrientationLandscapeRight
-        || [UPAVCapturer sharedInstance].videoOrientation == AVCaptureVideoOrientationLandscapeLeft) {
-        
-        [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGRectMake(0, 0, 640, 360);
+    switch (_settings.level) {
+        case UPAVCapturerPreset_480x360:
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(270, 480);
+            break;
+        case UPAVCapturerPreset_640x480:
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(360, 640);
+            break;
+        case UPAVCapturerPreset_1280x720:
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(720, 1280);
+            break;
     }
-    [UPAVCapturer sharedInstance].bitrate = 400000;
+    
+    // [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(360, 640);
+//    if ([UPAVCapturer sharedInstance].videoOrientation == AVCaptureVideoOrientationLandscapeRight
+//        || [UPAVCapturer sharedInstance].videoOrientation == AVCaptureVideoOrientationLandscapeLeft) {
+//        
+//        [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(640, 360);
+//    }
+//    [UPAVCapturer sharedInstance].bitrate = 400000;
+    /// 水印设置
+//    CGSize size = [UIScreen mainScreen].bounds.size;
+//    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
+//    label.text = @"我是水印";
+//    label.textAlignment = NSTextAlignmentRight;
+//    
+//    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
+//    imgV.image = [UIImage imageNamed:@"upyun_logo"];
+//    
+//    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+//    subView.backgroundColor = [UIColor clearColor];
+//    [subView addSubview:label];
+//    [subView addSubview:imgV];
+//    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
+//        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
+//    }];
+    
+    [UPAVCapturer sharedInstance].networkSateBlock = ^(int level) {
+        if (level == 0) {
+            NSLog(@"网络比较差");
+        } else if (level == 1){
+            NSLog(@"网络一般");
+        } else {
+            NSLog(@"网络良好");
+        }
+    };
+    
     [[UPAVCapturer sharedInstance] start];
+
     [self updateDashboard];
 }
 
 
 - (IBAction)streamingSwitch:(id)sender {
-    [UPAVCapturer sharedInstance].streamingOn = ![UPAVCapturer sharedInstance].streamingOn;
+//    [UPAVCapturer sharedInstance].streamingOn = ![UPAVCapturer sharedInstance].streamingOn;
+//    
+    UISwitch *item = sender;
+    // self.dashboard.hidden = !item.on;
+    
+        if (_filterCode == UPCustomFilterHefe + 2) {
+            _filterCode = 0;
+        }
+    
+        if (_filterCode == UPCustomFilterHefe + 1) {
+            [[UPAVCapturer sharedInstance] setFilter:nil];
+        } else {
+            [[UPAVCapturer sharedInstance] setFilterName:_filterCode];
+        }
+        _filterCode++;
+    
 }
 
 - (IBAction)filterSwitch:(id)sender {
-    //美颜开关
-    [UPAVCapturer sharedInstance].filterOn = ![UPAVCapturer sharedInstance].filterOn;
+    UISwitch *item = sender;
+    
+    [UPAVCapturer sharedInstance].filterOn = item.on;
+    
+//    /// 音量增益的代码
+//    NSLog(@"[UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate %d", [UPAVCapturer sharedInstance].increaserRate);
+//    [UPAVCapturer sharedInstance].increaserRate = [UPAVCapturer sharedInstance].increaserRate + 10;
+    
+    
+//    if (_filterCode == UPCustomFilterHefe + 2) {
+//        _filterCode = 0;
+//    }
+//    
+//    if (_filterCode == UPCustomFilterHefe + 1) {
+//        [[UPAVCapturer sharedInstance] setFilter:nil];
+//    } else {
+//        [[UPAVCapturer sharedInstance] setFilterName:_filterCode];
+//    }
+//    _filterCode++;
+    
+    
+    
+    // 美颜开关
+//    [UPAVCapturer sharedInstance].filterOn = ![UPAVCapturer sharedInstance].filterOn;
+//    if ([UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate == 10) {
+//        [UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate = 1;
+//    } else {
+//        [UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate = 10;
+//    }
 }
 
 - (IBAction)cameraSwitch:(id)sender {
-    //镜头切换的代码
+    
+
+    /// 降噪功能是否开启
+//    [UPAVCapturer sharedInstance].deNoise = ![UPAVCapturer sharedInstance].deNoise ;
+    
+//    /// 镜头切换的代码
     if ([UPAVCapturer sharedInstance].camaraPosition == AVCaptureDevicePositionBack) {
         [UPAVCapturer sharedInstance].camaraPosition = AVCaptureDevicePositionFront;
     } else {
@@ -150,6 +235,7 @@
 }
 
 - (IBAction)stop:(id)sender {
+//    [[UPAVCapturer sharedInstance] stop];
     [self dismissViewControllerAnimated:YES completion:^{
         [[UPAVCapturer sharedInstance] stop];
     }];
