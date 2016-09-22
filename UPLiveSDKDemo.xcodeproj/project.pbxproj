@@ -197,7 +197,6 @@
 		1EE859261D6C524700F7D777 /* GPUImageWhiteBalanceFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EE857D11D6C524700F7D777 /* GPUImageWhiteBalanceFilter.m */; };
 		1EE859271D6C524700F7D777 /* GPUImageXYDerivativeFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EE857D31D6C524700F7D777 /* GPUImageXYDerivativeFilter.m */; };
 		1EE859281D6C524700F7D777 /* GPUImageZoomBlurFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EE857D51D6C524700F7D777 /* GPUImageZoomBlurFilter.m */; };
-		1EE859291D6C524700F7D777 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1EE857D91D6C524700F7D777 /* Info.plist */; };
 		1EE8592A1D6C524700F7D777 /* GPUImageContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EE857DD1D6C524700F7D777 /* GPUImageContext.m */; };
 		1EE8592B1D6C524700F7D777 /* GPUImageMovieWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EE857DF1D6C524700F7D777 /* GPUImageMovieWriter.m */; };
 		1EE8592C1D6C524700F7D777 /* GPUImagePicture+TextureSubimage.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EE857E11D6C524700F7D777 /* GPUImagePicture+TextureSubimage.m */; };
@@ -649,9 +648,6 @@
 		1EE857D31D6C524700F7D777 /* GPUImageXYDerivativeFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageXYDerivativeFilter.m; sourceTree = "<group>"; };
 		1EE857D41D6C524700F7D777 /* GPUImageZoomBlurFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageZoomBlurFilter.h; sourceTree = "<group>"; };
 		1EE857D51D6C524700F7D777 /* GPUImageZoomBlurFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageZoomBlurFilter.m; sourceTree = "<group>"; };
-		1EE857D81D6C524700F7D777 /* GPUImageFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageFramework.h; sourceTree = "<group>"; };
-		1EE857D91D6C524700F7D777 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1EE857DA1D6C524700F7D777 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		1EE857DB1D6C524700F7D777 /* GPUImage-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GPUImage-Prefix.pch"; sourceTree = "<group>"; };
 		1EE857DC1D6C524700F7D777 /* GPUImageContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageContext.h; sourceTree = "<group>"; };
 		1EE857DD1D6C524700F7D777 /* GPUImageContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageContext.m; sourceTree = "<group>"; };
@@ -1195,7 +1191,6 @@
 		1EE857D61D6C524700F7D777 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				1EE857D71D6C524700F7D777 /* Framework */,
 				1EE857DB1D6C524700F7D777 /* GPUImage-Prefix.pch */,
 				1EE857DC1D6C524700F7D777 /* GPUImageContext.h */,
 				1EE857DD1D6C524700F7D777 /* GPUImageContext.m */,
@@ -1209,16 +1204,6 @@
 				1EE857E51D6C524700F7D777 /* GPUImageView.m */,
 			);
 			path = iOS;
-			sourceTree = "<group>";
-		};
-		1EE857D71D6C524700F7D777 /* Framework */ = {
-			isa = PBXGroup;
-			children = (
-				1EE857D81D6C524700F7D777 /* GPUImageFramework.h */,
-				1EE857D91D6C524700F7D777 /* Info.plist */,
-				1EE857DA1D6C524700F7D777 /* module.modulemap */,
-			);
-			path = Framework;
 			sourceTree = "<group>";
 		};
 		1EE857E61D6C524700F7D777 /* UPAVCapturer */ = {
@@ -1523,7 +1508,6 @@
 				1EE8597C1D6C524700F7D777 /* xproMap.png in Resources */,
 				1E88878A1CEEAA1400F8F8B0 /* UPLiveStreamerSettingVC.xib in Resources */,
 				1EE859761D6C524700F7D777 /* toasterOverlayMapWarm.png in Resources */,
-				1EE859291D6C524700F7D777 /* Info.plist in Resources */,
 				1EE859701D6C524700F7D777 /* sutroCurves.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
