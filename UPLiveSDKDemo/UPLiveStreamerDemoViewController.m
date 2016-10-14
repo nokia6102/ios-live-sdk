@@ -155,7 +155,6 @@
     cameraChecked = NO;
     cameraAvailable = NO;
     microphoneAvailable = NO;
-    NSLog(@"presentViewController");
     UPLiveStreamerLivingVC *livingVC = [[UPLiveStreamerLivingVC alloc] init];
     livingVC.settings = self.settings;
     [self presentViewController:livingVC animated:YES completion:nil];

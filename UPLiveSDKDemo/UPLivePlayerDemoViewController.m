@@ -97,6 +97,11 @@
 }
 
 - (void)beginBtn:(UIButton *)sender {
+    
+    
+    //test
+//    [_audioGraph start];
+
 
     UPLivePlayerVC *playerVC = [[UPLivePlayerVC alloc] init];
     playerVC.url = textFieldPlayUrl.text;
@@ -114,5 +119,6 @@
 - (void)hideKeyBoard {
     [textFieldPlayUrl resignFirstResponder];
 }
+
 
 @end

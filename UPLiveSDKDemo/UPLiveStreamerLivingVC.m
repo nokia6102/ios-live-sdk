@@ -10,23 +10,24 @@
 #import "UPAVCapturer.h"
 #import "AppDelegate.h"
 #import <UPLiveSDK/UPLiveSDKConfig.h>
+#import <UPLiveSDK/UPAVPlayer.h>
+
 
 @interface UPLiveStreamerLivingVC () <UPAVCapturerDelegate>
 {
     NSString *_videoOrientationDescription;
     NSString *_pushStreamStadusDescription;
+    UPAVPlayer *_bgmPlayer;
 }
-
+@property (weak, nonatomic) IBOutlet UISwitch *mixerSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *beauytifySwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *filterSwitch;
-@property (weak, nonatomic) IBOutlet UISwitch *streamingSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *cameraSwitch;
 @property (weak, nonatomic) IBOutlet UIView *panel;
 @property (weak, nonatomic) IBOutlet UITextView *dashboard;
 @property (nonatomic, strong) UIView *videoPreview;
 @property (nonatomic, strong) UILabel *descriptionLabel;
-
 @property (nonatomic, assign) CGFloat lastScale;
-
 @property (nonatomic, assign) NSInteger filterCode;
 
 @end
@@ -35,7 +36,6 @@
 
 - (void)viewDidLoad {
     self.view.backgroundColor = [UIColor whiteColor];
-    
     //设置视频预览视图 videoPreview
     UIViewContentMode previewContentMode = UIViewContentModeScaleAspectFit;
     if (_settings.fullScreenPreviewOn) {
@@ -86,7 +86,6 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     self.filterSwitch.on = _settings.filter;
-    self.streamingSwitch.on = _settings.streamingOn;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -101,7 +100,6 @@
     [UPAVCapturer sharedInstance].videoOrientation = _settings.videoOrientation;
     [UPAVCapturer sharedInstance].fps = _settings.fps;
     
-//    [[UPAVCapturer sharedInstance] setFilterName:UPCustomFilter1977];
     //推流地址
     NSString *rtmpPushUrl = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
     
@@ -115,8 +113,8 @@
     rtmpPushUrl = [NSString stringWithFormat:@"%@?_upt=%@", rtmpPushUrl, upToken];
     NSLog(@"rtmpPushUrl: %@", rtmpPushUrl);
     [UPAVCapturer sharedInstance].outStreamPath = rtmpPushUrl;
-    /// 要调节成 16:9 的比例, 可以自行调整要裁剪的大小
     
+    // 要调节成 16:9 的比例, 可以自行调整要裁剪的大小
     switch (_settings.level) {
         case UPAVCapturerPreset_480x360:
             [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(270, 480);
@@ -129,29 +127,22 @@
             break;
     }
     
-    // [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(360, 640);
-//    if ([UPAVCapturer sharedInstance].videoOrientation == AVCaptureVideoOrientationLandscapeRight
-//        || [UPAVCapturer sharedInstance].videoOrientation == AVCaptureVideoOrientationLandscapeLeft) {
-//        
-//        [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(640, 360);
-//    }
-//    [UPAVCapturer sharedInstance].bitrate = 400000;
-    /// 水印设置
-//    CGSize size = [UIScreen mainScreen].bounds.size;
-//    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
-//    label.text = @"我是水印";
-//    label.textAlignment = NSTextAlignmentRight;
-//    
-//    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
-//    imgV.image = [UIImage imageNamed:@"upyun_logo"];
-//    
-//    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
-//    subView.backgroundColor = [UIColor clearColor];
-//    [subView addSubview:label];
-//    [subView addSubview:imgV];
-//    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
-//        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
-//    }];
+    
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
+    label.text = @"我是水印";
+    label.textAlignment = NSTextAlignmentRight;
+    
+    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
+    imgV.image = [UIImage imageNamed:@"upyun_logo"];
+    
+    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+    subView.backgroundColor = [UIColor clearColor];
+    [subView addSubview:label];
+    [subView addSubview:imgV];
+    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
+        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
+    }];
     
     [UPAVCapturer sharedInstance].networkSateBlock = ^(int level) {
         if (level == 0) {
@@ -169,64 +160,27 @@
 }
 
 
-- (IBAction)streamingSwitch:(id)sender {
-//    [UPAVCapturer sharedInstance].streamingOn = ![UPAVCapturer sharedInstance].streamingOn;
-//    
-    UISwitch *item = sender;
-    // self.dashboard.hidden = !item.on;
-    
-        if (_filterCode == UPCustomFilterHefe + 2) {
-            _filterCode = 0;
-        }
-    
-        if (_filterCode == UPCustomFilterHefe + 1) {
-            [[UPAVCapturer sharedInstance] setFilter:nil];
-        } else {
-            [[UPAVCapturer sharedInstance] setFilterName:_filterCode];
-        }
-        _filterCode++;
-    
+- (IBAction)filterSwitch:(id)sender {
+    if (_filterCode > UPCustomFilterHefe) {
+        [[UPAVCapturer sharedInstance] setFilter:nil];
+    } else {
+        [[UPAVCapturer sharedInstance] setFilterName:_filterCode];
+    }
+    _filterCode ++;
 }
 
-- (IBAction)filterSwitch:(id)sender {
+- (IBAction)mixerSwitch:(UISwitch *)sender {
+    
+    [UPAVCapturer sharedInstance].backgroudMusicUrl = @"http://test86400.b0.upaiyun.com/music1.mp3";
+    [UPAVCapturer sharedInstance].backgroudMusicOn = ![UPAVCapturer sharedInstance].backgroudMusicOn;
+}
+
+- (IBAction)beautifySwitch:(id)sender {
     UISwitch *item = sender;
-    
     [UPAVCapturer sharedInstance].filterOn = item.on;
-    
-//    /// 音量增益的代码
-//    NSLog(@"[UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate %d", [UPAVCapturer sharedInstance].increaserRate);
-//    [UPAVCapturer sharedInstance].increaserRate = [UPAVCapturer sharedInstance].increaserRate + 10;
-    
-    
-//    if (_filterCode == UPCustomFilterHefe + 2) {
-//        _filterCode = 0;
-//    }
-//    
-//    if (_filterCode == UPCustomFilterHefe + 1) {
-//        [[UPAVCapturer sharedInstance] setFilter:nil];
-//    } else {
-//        [[UPAVCapturer sharedInstance] setFilterName:_filterCode];
-//    }
-//    _filterCode++;
-    
-    
-    
-    // 美颜开关
-//    [UPAVCapturer sharedInstance].filterOn = ![UPAVCapturer sharedInstance].filterOn;
-//    if ([UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate == 10) {
-//        [UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate = 1;
-//    } else {
-//        [UPAVCapturer sharedInstance].audioUnitRecorder.increaserRate = 10;
-//    }
 }
 
 - (IBAction)cameraSwitch:(id)sender {
-    
-
-    /// 降噪功能是否开启
-//    [UPAVCapturer sharedInstance].deNoise = ![UPAVCapturer sharedInstance].deNoise ;
-    
-//    /// 镜头切换的代码
     if ([UPAVCapturer sharedInstance].camaraPosition == AVCaptureDevicePositionBack) {
         [UPAVCapturer sharedInstance].camaraPosition = AVCaptureDevicePositionFront;
     } else {
@@ -235,12 +189,10 @@
 }
 
 - (IBAction)stop:(id)sender {
-//    [[UPAVCapturer sharedInstance] stop];
     [self dismissViewControllerAnimated:YES completion:^{
         [[UPAVCapturer sharedInstance] stop];
     }];
 }
-
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)sender {
     
@@ -305,7 +257,7 @@
 #pragma mark UPAVCapturerDelegate
 
 //采集状态
-- (void)UPAVCapturer:(UPAVCapturer *)capturer capturerStatusDidChange:(UPAVCapturerStatus)capturerStatus {
+- (void)capturer:(UPAVCapturer *)capturer capturerStatusDidChange:(UPAVCapturerStatus)capturerStatus {
     
     switch (capturerStatus) {
         case UPAVCapturerStatusStopped: {
@@ -326,7 +278,7 @@
     }
 }
 
-- (void)UPAVCapturer:(UPAVCapturer *)capturer capturerError:(NSError *)error {
+- (void)capturer:(UPAVCapturer *)capturer capturerError:(NSError *)error {
     if (error) {
         NSString *s = [NSString stringWithFormat:@"%@", error];
         [self errorAlert:s];
@@ -334,7 +286,7 @@
 }
 
 //推流状态
-- (void)UPAVCapturer:(UPAVCapturer *)capturer pushStreamStatusDidChange:(UPPushAVStreamStatus)streamStatus {
+- (void)capturer:(UPAVCapturer *)capturer pushStreamStatusDidChange:(UPPushAVStreamStatus)streamStatus {
     
     switch (streamStatus) {
         case UPPushAVStreamStatusClosed:
@@ -367,7 +319,6 @@
     self.descriptionLabel.text = [NSString stringWithFormat:@"%@%@", _videoOrientationDescription, _pushStreamStadusDescription];
 }
 
-
 - (void)updateDashboard{
     self.dashboard.text = [NSString stringWithFormat:@"%@", [UPAVCapturer sharedInstance].dashboard];
     self.dashboard.textColor = [UIColor redColor];
@@ -380,9 +331,8 @@
 }
 
 - (void)dealloc {
-    NSLog(@"dealloc %@", self);
+//    NSLog(@"dealloc %@", self);
 }
-
 
 
 @end

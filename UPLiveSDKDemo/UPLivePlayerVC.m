@@ -182,7 +182,7 @@
 
 #pragma mark UPAVPlayerDelegate
 
-- (void)UPAVPlayer:(UPAVPlayer *)player streamStatusDidChange:(UPAVStreamStatus)streamStatus {
+- (void)player:(UPAVPlayer *)player streamStatusDidChange:(UPAVStreamStatus)streamStatus {
     switch (streamStatus) {
         case UPAVStreamStatusIdle:
             NSLog(@"连接断开－－－－－");
@@ -200,7 +200,7 @@
     }
 }
 
-- (void)UPAVPlayer:(id)player playerStatusDidChange:(UPAVPlayerStatus)playerStatus {
+- (void)player:(id)player playerStatusDidChange:(UPAVPlayerStatus)playerStatus {
     
     switch (playerStatus) {
         case UPAVPlayerStatusIdle:{
@@ -260,7 +260,7 @@
     }
 }
 
-- (void)UPAVPlayer:(id)player streamInfoDidReceive:(UPAVPlayerStreamInfo *)streamInfo {
+- (void)player:(id)player streamInfoDidReceive:(UPAVPlayerStreamInfo *)streamInfo {
     if (streamInfo.canPause && streamInfo.canSeek) {
         _playProgressSlider.maximumValue = streamInfo.duration;
         NSLog(@"streamInfo.duration %f", streamInfo.duration);
@@ -269,7 +269,7 @@
     }
 }
 
-- (void)UPAVPlayer:(id)player displayPositionDidChange:(float)position {
+- (void)player:(id)player displayPositionDidChange:(float)position {
     if (_sliding) {
         return;
     }
@@ -277,7 +277,7 @@
     self.timelabel.text = [NSString stringWithFormat:@"%.0f / %.0f", position, _player.streamInfo.duration];
 }
 
-- (void)UPAVPlayer:(id)player playerError:(NSError *)error {
+- (void)player:(id)player playerError:(NSError *)error {
     [self.activityIndicatorView stopAnimating];
     self.bufferingProgressLabel.hidden = YES;
     NSString *msg = @"请重新尝试播放.";
@@ -295,7 +295,7 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-- (void)UPAVPlayer:(id)player bufferingProgressDidChange:(float)progress {
+- (void)player:(id)player bufferingProgressDidChange:(float)progress {
     self.bufferingProgressLabel.text = [NSString stringWithFormat:@"%.0f %%", (progress * 100)];
 }
 
