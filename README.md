@@ -353,6 +353,12 @@ __2.7 增加直播混音功能__  __更新建议: 建议更新, 2016.10.14__
 * `Swift` 适配, 可以在 `Swift` 工程直接使用 `UPLiveSDK.framework`.
 * __[注意]__  `UPAVPlayerDelegate`、`UPAVStreamerDelegate`、`UPAVCapturerDelegate` 方法名变动.
 * bug fix 
+
+__2.8 增加新推流分辨率,修复BUG__  __更新建议: 可以更新, 2016.10.27__
+
+* 增加 960X540 推流分辨率,
+* 修复推流状态回调不及时的 BUG 
+
  
 ## 反馈与建议
 

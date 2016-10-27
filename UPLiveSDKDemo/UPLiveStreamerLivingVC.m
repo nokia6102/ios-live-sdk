@@ -122,27 +122,32 @@
         case UPAVCapturerPreset_640x480:
             [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(360, 640);
             break;
+        case UPAVCapturerPreset_960x540:
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(540, 960);
+            break;
         case UPAVCapturerPreset_1280x720:
             [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(720, 1280);
             break;
     }
     
     
-    CGSize size = [UIScreen mainScreen].bounds.size;
-    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
-    label.text = @"我是水印";
-    label.textAlignment = NSTextAlignmentRight;
+//    CGSize size = [UIScreen mainScreen].bounds.size;
+//    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
+//    label.text = @"我是水印";
+//    label.textAlignment = NSTextAlignmentRight;
+//    
+//    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
+//    imgV.image = [UIImage imageNamed:@"upyun_logo"];
+//    
+//    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+//    subView.backgroundColor = [UIColor clearColor];
+//    [subView addSubview:label];
+//    [subView addSubview:imgV];
+//    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
+//        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
+//    }];
     
-    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
-    imgV.image = [UIImage imageNamed:@"upyun_logo"];
     
-    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
-    subView.backgroundColor = [UIColor clearColor];
-    [subView addSubview:label];
-    [subView addSubview:imgV];
-    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
-        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
-    }];
     
     [UPAVCapturer sharedInstance].networkSateBlock = ^(int level) {
         if (level == 0) {
