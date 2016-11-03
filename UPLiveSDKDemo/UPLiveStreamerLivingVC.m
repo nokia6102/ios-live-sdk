@@ -93,7 +93,9 @@
 }
 
 - (void)start {
+    
     [[UPAVCapturer sharedInstance] stop];
+    [UPAVCapturer sharedInstance].openDynamicBitrate = YES;
     [UPAVCapturer sharedInstance].capturerPresetLevel = _settings.level;
     [UPAVCapturer sharedInstance].camaraPosition = _settings.camaraPosition;
     [UPAVCapturer sharedInstance].camaraTorchOn = _settings.camaraTorchOn;
@@ -102,31 +104,34 @@
     
     //推流地址
     NSString *rtmpPushUrl = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
-    
+//    rtmpPushUrl = @"rtmp://push.capitalcloud.net/791691368117590174/1";
     //计算 upToken
-    NSString *upToken = [UPAVCapturer tokenWithKey:@"password"
-                                            bucket:@"testlivesdk"
+    NSString *upToken = [UPAVCapturer tokenWithKey:@"passwork"
+                                            bucket:@"bucket"
                                         expiration:86400
                                    applicationName:_settings.rtmpServerPushPath.lastPathComponent
                                         streamName:_settings.streamId];
     
     rtmpPushUrl = [NSString stringWithFormat:@"%@?_upt=%@", rtmpPushUrl, upToken];
     NSLog(@"rtmpPushUrl: %@", rtmpPushUrl);
+    
+    
     [UPAVCapturer sharedInstance].outStreamPath = rtmpPushUrl;
     
     // 要调节成 16:9 的比例, 可以自行调整要裁剪的大小
+    // 注意有些尺寸不支持连麦
     switch (_settings.level) {
         case UPAVCapturerPreset_480x360:
-            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(270, 480);
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize = CGSizeMake(360, 480);
             break;
         case UPAVCapturerPreset_640x480:
-            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(360, 640);
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize= CGSizeMake(360, 640);//剪裁为 16 : 9
             break;
         case UPAVCapturerPreset_960x540:
-            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(540, 960);
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize = CGSizeMake(540, 960);
             break;
         case UPAVCapturerPreset_1280x720:
-            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropRect = CGSizeMake(720, 1280);
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize = CGSizeMake(720, 1280);
             break;
     }
     
@@ -148,11 +153,10 @@
 //    }];
     
     
-    
-    [UPAVCapturer sharedInstance].networkSateBlock = ^(int level) {
-        if (level == 0) {
+    [UPAVCapturer sharedInstance].networkSateBlock = ^(UPAVStreamerNetworkState level) {
+        if (level == UPAVStreamerNetworkState_BAD) {
             NSLog(@"网络比较差");
-        } else if (level == 1){
+        } else if (level == UPAVStreamerNetworkState_NORMAL) {
             NSLog(@"网络一般");
         } else {
             NSLog(@"网络良好");
@@ -160,10 +164,19 @@
     };
     
     [[UPAVCapturer sharedInstance] start];
-
     [self updateDashboard];
 }
 
+- (IBAction)rtcSwitch:(UISwitch *)sender {
+    if (sender.on) {
+        NSString *rtcChannelId = _settings.streamId;//设置连麦房间号与推流id一致，便于播放客户端进行连麦
+        [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
+    } else {
+        [[UPAVCapturer sharedInstance] rtcClose];
+    }
+    
+
+}
 
 - (IBAction)filterSwitch:(id)sender {
     if (_filterCode > UPCustomFilterHefe) {

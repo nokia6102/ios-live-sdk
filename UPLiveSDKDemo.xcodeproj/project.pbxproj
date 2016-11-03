@@ -1887,7 +1887,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/UPLiveSDKDemo/UPLiveServer",
 					"$(PROJECT_DIR)/UPLiveService",
 				);
 				INFOPLIST_FILE = UPLiveSDKDemo/Info.plist;
@@ -1914,7 +1913,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/UPLiveSDKDemo/UPLiveServer",
 					"$(PROJECT_DIR)/UPLiveService",
 				);
 				INFOPLIST_FILE = UPLiveSDKDemo/Info.plist;

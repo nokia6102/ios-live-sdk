@@ -60,6 +60,10 @@
     self.fpsLabel.text = [NSString stringWithFormat:@"%d", _settings.fps];
 
     self.resolutionSelectBtn.selectedSegmentIndex = _settings.level;
+
+    if (_settings.level == 3) {
+        self.resolutionSelectBtn.selectedSegmentIndex = 2; //仅测试 720p
+    }
     
     if (_settings.filterLevel == 0) {
         self.filterLevelSelect.selectedSegmentIndex = 0;
@@ -121,6 +125,11 @@
 }
 - (IBAction)resolutionSelectBtn:(UISegmentedControl *)sender {
     _settings.level = sender.selectedSegmentIndex;
+    
+    //演示 1280 ＊ 720
+    if (sender.selectedSegmentIndex == 2) {
+        _settings.level = 3;
+    }
 }
 
 - (IBAction)cameraSelectBtn:(UISegmentedControl *)sender {
