@@ -13,6 +13,14 @@
 
 [UPYUN 直播平台自主配置流程](http://docs.upyun.com/live/) 
   
+  
+## SDK下载
+Demo 下载: `https://github.com/upyun/ios-live-sdk`
+
+## 连麦模块 framework 及文档下载
+[连麦文档](https://github.com/upyun/ios-live-sdk/blob/master/README_rtc.md)
+UPRtcSDK.framework 下载：```http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip```
+  
 ## SDK使用说明
 
 ### 运行环境和兼容性
@@ -24,7 +32,7 @@
 ### 安装使用说明
 #### pod 安装方法：
 
- `pod 'UPLiveSDK', '~> 2.9'`
+ `pod 'UPLiveSDK', '~> 3.0'`
 
 __注: 如果使用 pod 安装, 需要设置工程 TARGET 和 Pod 里面 UPLiveSDK TARGET ```Enable bitcode```： NO , 不需要添加依赖库.__
 	
@@ -123,12 +131,6 @@ UPLiveService 文件夹
 
 * 支持自动音画同步调整
 
-
-## SDK下载
-Demo 下载: `https://github.com/upyun/ios-live-sdk`
-
-## 连麦模块 framework 及文档下载
-UPRtcSDK.framework 下载：```http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip```
 
 
 
