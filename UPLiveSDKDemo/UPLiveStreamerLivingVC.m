@@ -73,7 +73,7 @@
     [self.view insertSubview:self.videoPreview atIndex:0];
     
     //开启 debug 信息
-    [UPLiveSDKConfig setLogLevel:UP_Level_error];
+    [UPLiveSDKConfig setLogLevel:UP_Level_debug];
 
     //设置代理，采集状态推流信息回调
     [UPAVCapturer sharedInstance].delegate = self;
@@ -168,14 +168,20 @@
 }
 
 - (IBAction)rtcSwitch:(UISwitch *)sender {
+    [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
     if (sender.on) {
-        NSString *rtcChannelId = _settings.streamId;//设置连麦房间号与推流id一致，便于播放客户端进行连麦
-        [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
+        //设置连麦房间号与推流id一致，方便播放客户端进行连麦
+        NSString *rtcChannelId = _settings.streamId;
+        int ret = [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
+        if (ret == -1) {
+            [self errorAlert:@"连麦功能需要安装连麦模块：UPRtcSDK.framework"];
+        }
+        if (ret == -2) {
+            [self errorAlert:@"连麦错误：请检查 appID 及 采集视频尺寸"];
+        }
     } else {
         [[UPAVCapturer sharedInstance] rtcClose];
     }
-    
-
 }
 
 - (IBAction)filterSwitch:(id)sender {
@@ -228,7 +234,7 @@
 - (void)errorAlert:(NSString *)message {
     dispatch_async(dispatch_get_main_queue(), ^(){
         
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"推流错误，请检查网络重试，或者更换一个流id后重试"
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
                                                                        message:message
                                                                 preferredStyle:UIAlertControllerStyleAlert];
         
@@ -299,7 +305,7 @@
 - (void)capturer:(UPAVCapturer *)capturer capturerError:(NSError *)error {
     if (error) {
         NSString *s = [NSString stringWithFormat:@"%@", error];
-        [self errorAlert:s];
+        [self errorAlert:[NSString stringWithFormat:@"推流错误，请检查网络重试，或者更换一个流id后重试%@",s]];
     }
 }
 

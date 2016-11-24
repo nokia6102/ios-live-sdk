@@ -18,7 +18,7 @@
 @end
 
 
-@interface UPLiveStreamerDemoViewController ()<UITextFieldDelegate>
+@interface UPLiveStreamerDemoViewController ()<UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
 {
     UITextView *textViewPushUrl;
     UITextView *textViewPlayUrl;
@@ -29,6 +29,10 @@
     BOOL cameraAvailable;
     BOOL microphoneChecked;
     BOOL cameraChecked;
+    
+    UITableView *_tableView;
+    NSMutableArray *_streamerHistoryUrls;
+
 }
 
 @end
@@ -37,6 +41,19 @@
 
 
 - (void)viewDidLoad {
+    
+    NSArray *historyUrls = [[NSUserDefaults standardUserDefaults] objectForKey:@"_streamerHistoryUrls"];
+    if (historyUrls) {
+        _streamerHistoryUrls = [[NSMutableArray alloc] initWithArray:historyUrls];
+    } else {
+        _streamerHistoryUrls = [NSMutableArray new];
+        [_streamerHistoryUrls addObject:@"rtmp://testlivesdk.v0.upaiyun.com/live/test1"];
+        [[NSUserDefaults standardUserDefaults] setObject:_streamerHistoryUrls forKey:@"_streamerHistoryUrls"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+    
+    
     self.view.backgroundColor = [UIColor whiteColor];
     
     //default settings
@@ -62,6 +79,7 @@
     textFieldStreamId.delegate = self;
     textFieldStreamId.text = @"test1";
     textFieldStreamId.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldStreamId.returnKeyType = UIReturnKeyDone;
     self.settings.streamId = textFieldStreamId.text;
 
     UILabel *labelPushUrl = [[UILabel alloc] initWithFrame:CGRectMake(20, 200, 100, 44)];
@@ -104,13 +122,23 @@
     [self updateUI];
     
     self.view.backgroundColor = [UIColor whiteColor];
-    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc]
-                                           initWithTarget:self
-                                           action:@selector(hideKeyBoard)];
+//    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc]
+//                                           initWithTarget:self
+//                                           action:@selector(hideKeyBoard)];
+//    
+//    [self.view addGestureRecognizer:tapGesture];
     
-    [self.view addGestureRecognizer:tapGesture];
+    [_tableView removeFromSuperview];
+    CGFloat s_w = [UIScreen mainScreen].bounds.size.width;
+    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 470, s_w, 200)];
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    [self.view addSubview:_tableView];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [self updateUI];
+}
 - (void)updateUI {
     //计算 upToken
     NSString *upToken = [UPAVCapturer tokenWithKey:@"password"
@@ -134,6 +162,10 @@
 
     NSString *hlsPlayUrl = [NSString stringWithFormat:@"http://%@/%@/%@.m3u8?_upt=%@", url.host, _settings.rtmpServerPushPath.lastPathComponent,self.settings.streamId, upToken];
     textViewPlayUrl.text = [NSString stringWithFormat:@"%@ \n%@", rtmpPlayUrl, hlsPlayUrl];
+    
+    textFieldStreamId.text = _settings.streamId;
+
+    [_tableView reloadData];
 }
 
 - (void)settingsBtn:(UIButton *)sender {
@@ -194,6 +226,13 @@
         });
 
     }];
+    
+    NSString *url = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
+    [_streamerHistoryUrls removeObject:url];
+    [_streamerHistoryUrls insertObject:url atIndex:0];
+    [[NSUserDefaults standardUserDefaults] setObject:_streamerHistoryUrls forKey:@"_streamerHistoryUrls"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
 }
 
 - (void)errorAlert:(NSString *)message {
@@ -236,5 +275,41 @@
 }
 
 
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    
+    return _streamerHistoryUrls.count;
+    
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *CellIdentifier = @"cell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] ;
+    }
+    
+    cell.textLabel.text = _streamerHistoryUrls[indexPath.row];
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:12];
+    cell.textLabel.textColor = [UIColor lightGrayColor];
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSString *url = [_streamerHistoryUrls objectAtIndex:indexPath.row];
+    NSURL *rtmpUrl = [NSURL URLWithString:url];
+    
+    if ([rtmpUrl.scheme isEqualToString:@"rtmp"] &&
+        rtmpUrl.pathComponents.count == 3) {
+        _settings.rtmpServerPushPath = [url stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@",rtmpUrl.lastPathComponent] withString:@""];
+        self.settings.streamId = rtmpUrl.lastPathComponent;
+
+        [self updateUI];
+        
+    }
+}
+
+- (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return @"推流历史：";
+}
 
 @end

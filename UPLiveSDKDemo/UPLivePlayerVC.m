@@ -11,27 +11,33 @@
 #import "AppDelegate.h"
 #import "UPAVCapturer.h"
 
-@interface UPLivePlayerVC () <UPAVPlayerDelegate>
+//在播放界面接入连麦功能
+#import "UPAVCapturer.h"
+
+
+@interface UPLivePlayerVC () <UPAVPlayerDelegate, UPAVCapturerDelegate>
 {
     UPAVPlayer *_player;
     UIActivityIndicatorView *_activityIndicatorView;
     UILabel *_bufferingProgressLabel;
     BOOL _sliding;
+    BOOL _rtcConnected;//是否已连麦
 }
 
 @property (weak, nonatomic) IBOutlet UIButton *playBtn;
 @property (weak, nonatomic) IBOutlet UIButton *pauseBtn;
 @property (weak, nonatomic) IBOutlet UIButton *stopBtn;
 @property (weak, nonatomic) IBOutlet UIButton *infoBtn;
-
-
 @property (weak, nonatomic) IBOutlet UILabel *timelabel;
-
 @property (weak, nonatomic) IBOutlet UISlider *playProgressSlider;
+@property (weak, nonatomic) IBOutlet UIButton *rtcBtn;
+
+
 
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicatorView;
 @property (nonatomic, strong) UILabel *bufferingProgressLabel;
 @property (weak, nonatomic) IBOutlet UITextView *dashboardView;
+@property (nonatomic, strong) UIView *videoPreview;//连麦大视图
 
 @end
 
@@ -39,9 +45,7 @@
 
 - (void)viewDidLoad {
     [UPLiveSDKConfig setLogLevel:UP_Level_debug];
-
     self.view.backgroundColor = [UIColor blackColor];
-    
     _activityIndicatorView = [[UIActivityIndicatorView alloc] init];
     _activityIndicatorView = [ [ UIActivityIndicatorView alloc ] initWithFrame:CGRectMake(250.0,20.0,30.0,30.0)];
     _activityIndicatorView.activityIndicatorViewStyle= UIActivityIndicatorViewStyleWhite;
@@ -59,6 +63,8 @@
     [_infoBtn addTarget:self action:@selector(info:) forControlEvents:UIControlEventTouchUpInside];
     [_infoBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
     [_infoBtn setTitle:@"streamInfo" forState:UIControlStateNormal];
+    
+    [_rtcBtn addTarget:self action:@selector(rtcStart:) forControlEvents:UIControlEventTouchUpInside];
     
     
     _bufferingProgressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 60, 40)];
@@ -78,6 +84,8 @@
     [self.view addSubview:_stopBtn];
     [self.view addSubview:_infoBtn];
     [self.view addSubview:_bufferingProgressLabel];
+    [self.view insertSubview:_rtcBtn atIndex:101];
+    
     
     
     _player = [[UPAVPlayer alloc] initWithURL:self.url];
@@ -86,19 +94,10 @@
     _player.lipSynchOn = NO;
     self.dashboardView.hidden = YES;
     [self updateDashboard];
-    
-    
-    // 简单的一屏幕多画 实现, 初始化
-//    UPAVPlayer *secondPlayer = [[UPAVPlayer alloc] initWithURL:self.url];
-//    secondPlayer.playView.contentMode = UIViewContentModeScaleToFill;
-//    [secondPlayer setFrame:CGRectMake(100, 100, 300, 100)];
-//    [secondPlayer play];
-//    
-//    [self.view insertSubview:secondPlayer.playView atIndex:0];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    
+
     self.view.frame = [UIScreen mainScreen].bounds;
     [_player setFrame:[UIScreen mainScreen].bounds];
 
@@ -123,6 +122,9 @@
 - (void)pause:(id)sender {
     [_player pause];
 }
+
+
+
 
 - (void)info:(id)sender {
     self.dashboardView.hidden =  !self.dashboardView.hidden;
@@ -166,6 +168,9 @@
 
 - (IBAction)close:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
+    if(_rtcConnected){
+        [[UPAVCapturer sharedInstance] stop];
+    }
 }
 
 -(void)touchDown:(UISlider *)slider{
@@ -262,6 +267,7 @@
 
 - (void)player:(id)player streamInfoDidReceive:(UPAVPlayerStreamInfo *)streamInfo {
     if (streamInfo.canPause && streamInfo.canSeek) {
+        _playProgressSlider.enabled = YES;
         _playProgressSlider.maximumValue = streamInfo.duration;
         NSLog(@"streamInfo.duration %f", streamInfo.duration);
     } else {
@@ -298,5 +304,77 @@
 - (void)player:(id)player bufferingProgressDidChange:(float)progress {
     self.bufferingProgressLabel.text = [NSString stringWithFormat:@"%.0f %%", (progress * 100)];
 }
+
+- (void)rtcStart:(UIButton *)sender {
+    // 按钮切换
+    if (sender.tag != 0) {
+        sender.tag = 0;
+        [sender setTitle:@"连麦" forState:UIControlStateNormal];
+        
+        //关闭当前连麦
+        [[UPAVCapturer sharedInstance] stop];
+        [self.videoPreview removeFromSuperview];
+        return;
+
+    } else {
+        sender.tag = 1;
+        [sender setTitle:@"关闭连麦" forState:UIControlStateNormal];
+    }
+
+    //观众连麦需要先关掉播放器
+    [_player stop];
+    
+    NSLog(@"开启采集 － 进行连麦");
+    //设置代理，采集状态信息回调
+    [UPAVCapturer sharedInstance].delegate = self;
+    self.videoPreview = [[UPAVCapturer sharedInstance] previewWithFrame:[UIScreen mainScreen].bounds
+                                                            contentMode:UIViewContentModeScaleAspectFill];
+    self.videoPreview.backgroundColor = [UIColor blackColor];
+    [self.view insertSubview:self.videoPreview belowSubview:_rtcBtn];
+    [[UPAVCapturer sharedInstance] stop];
+    [UPAVCapturer sharedInstance].openDynamicBitrate = YES;
+    [UPAVCapturer sharedInstance].capturerPresetLevel = UPAVCapturerPreset_640x480;
+    [UPAVCapturer sharedInstance].camaraPosition = AVCaptureDevicePositionFront;
+    [UPAVCapturer sharedInstance].videoOrientation = AVCaptureVideoOrientationPortrait;
+    [UPAVCapturer sharedInstance].fps = 20;
+    //观众端连麦不需要 rtmp 推流，所以不要设置 outStreamPath。同时关闭 UPAVCapturer 推流开关。
+    [UPAVCapturer sharedInstance].streamingOn = NO;
+    [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize= CGSizeMake(360, 640);//剪裁为 16 : 9
+    [UPAVCapturer sharedInstance].filterOn = YES;
+    [[UPAVCapturer sharedInstance] start];
+    
+    //需要设置 rtc appId
+    [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
+    //设置连麦的 channelID，UPLiveSDKDemo 中使用推拉流 id 当作 channelID，方便和主播端连麦的配合。
+    NSString *rtcChannelId = [NSURL URLWithString:self.url].pathComponents.lastObject;
+    [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
+    _rtcConnected = YES;
+}
+
+//采集状态
+- (void)capturer:(UPAVCapturer *)capturer capturerStatusDidChange:(UPAVCapturerStatus)capturerStatus {
+    switch (capturerStatus) {
+        case UPAVCapturerStatusStopped: {
+            NSLog(@"===UPAVCapturerStatusStopped");
+        }
+            break;
+        case UPAVCapturerStatusLiving: {
+            NSLog(@"===UPAVCapturerStatusLiving");
+            
+        }
+            break;
+        case UPAVCapturerStatusError: {
+            NSLog(@"===UPAVCapturerStatusError");
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)capturer:(UPAVCapturer *)capturer capturerError:(NSError *)error {
+    NSLog(@"视频采集错误！%@",  error);
+}
+
 
 @end

@@ -3,7 +3,8 @@
 
 ## SDK 概述
 
-此 `SDK` 包含__推流__和__拉流__两部分，及美颜滤镜等全套直播功能；       
+此 `SDK` 包含__推流__和__拉流__两部分，及美颜滤镜，连麦等全套直播功能；
+       
 
 此 `SDK` 中的播放器、采集器、推流器可单独使用。用户可以自主构建直播中某个环节，比如播放器（`UPAVPlayer`）可以与 Web 推流器 Flex 相配合。推流器（`UPAVStreamer`）可以配合系统自带的AVCapture 或者`GPUImage `库提供的采集功能。 
 
@@ -96,7 +97,9 @@ UPLiveService 文件夹
 
 * 支持单音频推流
 
-* 支持静音推流
+* 支持静音推流	
+
+* 支持连麦推流
 
 
 
@@ -123,6 +126,10 @@ UPLiveService 文件夹
 
 ## SDK下载
 Demo 下载: `https://github.com/upyun/ios-live-sdk`
+
+## 连麦模块 framework 及文档下载
+UPRtcSDK.framework 下载：```http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip```
+
 
 
 ## 推流 SDK 使用示例 UPAVCapturer
@@ -264,7 +271,16 @@ __10.如何快速体验和测试直播？__
 
 
 
-## 版本历史
+## 版本历史      			       
+
+
+
+__3.0 支持连麦  __更新建议: 建议更新, 2016.11.24__                   
+	         				
+* 支持直播连麦	
+* bug fix			
+
+
 __2.9 增加动态码率__  __更新建议: 建议更新, 2016.11.3__
 
 * 增加 动态码率功能 (开启方法: `[UPAVCapturer sharedInstance].openDynamicBitrate = YES`)
@@ -363,3 +379,5 @@ __1.0.1 基本的直播推流器和播放器；__
  
  QQ: `3392887145`
  
+
+

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1E091A991D34F1CC00F815CE /* UPLivePlayerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E091A981D34F1CC00F815CE /* UPLivePlayerVC.m */; };
+		1E36470E1DB9BD0F00C8178F /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E36470D1DB9BD0F00C8178F /* CoreMotion.framework */; };
+		1E3647181DB9E94F00C8178F /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E3647171DB9E94F00C8178F /* libc++.tbd */; };
 		1E8887851CEDC4B500F8F8B0 /* UPLiveStreamerLivingVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E8887841CEDC4B500F8F8B0 /* UPLiveStreamerLivingVC.m */; };
 		1E8887891CEEAA1400F8F8B0 /* UPLiveStreamerSettingVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E8887871CEEAA1400F8F8B0 /* UPLiveStreamerSettingVC.m */; };
 		1E88878A1CEEAA1400F8F8B0 /* UPLiveStreamerSettingVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1E8887881CEEAA1400F8F8B0 /* UPLiveStreamerSettingVC.xib */; };
@@ -300,6 +302,9 @@
 /* Begin PBXFileReference section */
 		1E091A971D34F1CC00F815CE /* UPLivePlayerVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPLivePlayerVC.h; sourceTree = "<group>"; };
 		1E091A981D34F1CC00F815CE /* UPLivePlayerVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPLivePlayerVC.m; sourceTree = "<group>"; };
+		1E36470D1DB9BD0F00C8178F /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		1E3647151DB9E94400C8178F /* libc++abi.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++abi.tbd"; path = "usr/lib/libc++abi.tbd"; sourceTree = SDKROOT; };
+		1E3647171DB9E94F00C8178F /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		1E8887831CEDC4B500F8F8B0 /* UPLiveStreamerLivingVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPLiveStreamerLivingVC.h; sourceTree = "<group>"; };
 		1E8887841CEDC4B500F8F8B0 /* UPLiveStreamerLivingVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UPLiveStreamerLivingVC.m; sourceTree = "<group>"; };
 		1E8887861CEEAA1400F8F8B0 /* UPLiveStreamerSettingVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UPLiveStreamerSettingVC.h; sourceTree = "<group>"; };
@@ -775,7 +780,14 @@
 		1EE858801D6C524700F7D777 /* UPLiveSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UPLiveSDK.framework; sourceTree = "<group>"; };
 		1EF6AD3F1CEEEFFE004A7DCA /* UPLivePlayerVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UPLivePlayerVC.xib; sourceTree = "<group>"; };
 		3E70006B1DACC9E000D4B193 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		3E70006E1DACC9E000D4B193 /* MovieClipHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MovieClipHandler.h; sourceTree = "<group>"; };
+		3E70006F1DACC9E000D4B193 /* MovieClipHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MovieClipHandler.m; sourceTree = "<group>"; };
+		3E7000711DACC9E000D4B193 /* SampleHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SampleHandler.h; sourceTree = "<group>"; };
+		3E7000721DACC9E000D4B193 /* SampleHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SampleHandler.m; sourceTree = "<group>"; };
+		3E7000741DACC9E000D4B193 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3E70007B1DACC9E000D4B193 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		3E70009F1DACCC3200D4B193 /* Uploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Uploader.h; sourceTree = "<group>"; };
+		3E7000A01DACCC3200D4B193 /* Uploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Uploader.m; sourceTree = "<group>"; };
 		3ED9DBB11D8FC1AB004B53B3 /* upyun_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upyun_logo.png; sourceTree = "<group>"; };
 		AE721F841CE9655C000B170A /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		AE721F861CE96567000B170A /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
@@ -794,6 +806,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E3647181DB9E94F00C8178F /* libc++.tbd in Frameworks */,
+				1E36470E1DB9BD0F00C8178F /* CoreMotion.framework in Frameworks */,
 				AEB817A11D0F956100F97E66 /* CoreTelephony.framework in Frameworks */,
 				AE721F871CE96567000B170A /* CoreVideo.framework in Frameworks */,
 				AE721F851CE9655C000B170A /* CoreMedia.framework in Frameworks */,
@@ -816,6 +830,7 @@
 		1EA224121CD9CC46007BF4B4 = {
 			isa = PBXGroup;
 			children = (
+				3E70006D1DACC9E000D4B193 /* UPUpload */,
 				AEEBB2C91D6EF15C00B8C290 /* Frameworks */,
 				1EE856831D6C524600F7D777 /* UPLiveService */,
 				1EA2241D1CD9CC46007BF4B4 /* UPLiveSDKDemo */,
@@ -861,9 +876,9 @@
 		1EE856831D6C524600F7D777 /* UPLiveService */ = {
 			isa = PBXGroup;
 			children = (
+				1EE858801D6C524700F7D777 /* UPLiveSDK.framework */,
 				1EE856841D6C524600F7D777 /* GPUImage */,
 				1EE857E61D6C524700F7D777 /* UPAVCapturer */,
-				1EE858801D6C524700F7D777 /* UPLiveSDK.framework */,
 			);
 			path = UPLiveService;
 			sourceTree = "<group>";
@@ -1405,9 +1420,26 @@
 			name = streamingVCs;
 			sourceTree = "<group>";
 		};
+		3E70006D1DACC9E000D4B193 /* UPUpload */ = {
+			isa = PBXGroup;
+			children = (
+				3E70006E1DACC9E000D4B193 /* MovieClipHandler.h */,
+				3E70006F1DACC9E000D4B193 /* MovieClipHandler.m */,
+				3E7000711DACC9E000D4B193 /* SampleHandler.h */,
+				3E7000721DACC9E000D4B193 /* SampleHandler.m */,
+				3E7000741DACC9E000D4B193 /* Info.plist */,
+				3E70009F1DACCC3200D4B193 /* Uploader.h */,
+				3E7000A01DACCC3200D4B193 /* Uploader.m */,
+			);
+			path = UPUpload;
+			sourceTree = "<group>";
+		};
 		AEEBB2C91D6EF15C00B8C290 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1E3647171DB9E94F00C8178F /* libc++.tbd */,
+				1E3647151DB9E94400C8178F /* libc++abi.tbd */,
+				1E36470D1DB9BD0F00C8178F /* CoreMotion.framework */,
 				AEB817A41D0F957500F97E66 /* SystemConfiguration.framework */,
 				AEB817A21D0F956900F97E66 /* libresolv.tbd */,
 				AEB817A01D0F956100F97E66 /* CoreTelephony.framework */,
@@ -1455,12 +1487,12 @@
 		1EA224131CD9CC46007BF4B4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = upyun.com;
 				TargetAttributes = {
 					1EA2241A1CD9CC46007BF4B4 = {
 						CreatedOnToolsVersion = 7.2.1;
-						DevelopmentTeam = FX6QTNRB57;
+						DevelopmentTeam = DCJ5V29KGG;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -1803,10 +1835,8 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1849,10 +1879,8 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1882,7 +1910,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = FX6QTNRB57;
+				DEVELOPMENT_TEAM = DCJ5V29KGG;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1890,6 +1918,7 @@
 					"$(PROJECT_DIR)/UPLiveService",
 				);
 				INFOPLIST_FILE = UPLiveSDKDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1908,7 +1937,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = FX6QTNRB57;
+				DEVELOPMENT_TEAM = DCJ5V29KGG;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1916,6 +1945,7 @@
 					"$(PROJECT_DIR)/UPLiveService",
 				);
 				INFOPLIST_FILE = UPLiveSDKDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
