@@ -315,40 +315,44 @@
         [[UPAVCapturer sharedInstance] stop];
         [self.videoPreview removeFromSuperview];
         return;
-
+        
     } else {
         sender.tag = 1;
         [sender setTitle:@"关闭连麦" forState:UIControlStateNormal];
     }
-
-    //观众连麦需要先关掉播放器
+    
+    //连麦需要先关掉播放器
     [_player stop];
     
-    NSLog(@"开启采集 － 进行连麦");
-    //设置代理，采集状态信息回调
-    [UPAVCapturer sharedInstance].delegate = self;
-    self.videoPreview = [[UPAVCapturer sharedInstance] previewWithFrame:[UIScreen mainScreen].bounds
-                                                            contentMode:UIViewContentModeScaleAspectFill];
-    self.videoPreview.backgroundColor = [UIColor blackColor];
-    [self.view insertSubview:self.videoPreview belowSubview:_rtcBtn];
-    [[UPAVCapturer sharedInstance] stop];
-    [UPAVCapturer sharedInstance].openDynamicBitrate = YES;
-    [UPAVCapturer sharedInstance].capturerPresetLevel = UPAVCapturerPreset_640x480;
-    [UPAVCapturer sharedInstance].camaraPosition = AVCaptureDevicePositionFront;
-    [UPAVCapturer sharedInstance].videoOrientation = AVCaptureVideoOrientationPortrait;
-    [UPAVCapturer sharedInstance].fps = 20;
-    //观众端连麦不需要 rtmp 推流，所以不要设置 outStreamPath。同时关闭 UPAVCapturer 推流开关。
-    [UPAVCapturer sharedInstance].streamingOn = NO;
-    [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize= CGSizeMake(360, 640);//剪裁为 16 : 9
-    [UPAVCapturer sharedInstance].filterOn = YES;
-    [[UPAVCapturer sharedInstance] start];
     
-    //需要设置 rtc appId
-    [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
-    //设置连麦的 channelID，UPLiveSDKDemo 中使用推拉流 id 当作 channelID，方便和主播端连麦的配合。
-    NSString *rtcChannelId = [NSURL URLWithString:self.url].pathComponents.lastObject;
-    [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
-    _rtcConnected = YES;
+    //_player stop 是异步执行，无法立即结束。所以需要在 main_queue 下一个 block 中来启动连麦过程。
+    dispatch_async(dispatch_get_main_queue(), ^(){
+        NSLog(@"开启采集 － 进行连麦");
+        //设置代理，采集状态信息回调
+        [UPAVCapturer sharedInstance].delegate = self;
+        self.videoPreview = [[UPAVCapturer sharedInstance] previewWithFrame:[UIScreen mainScreen].bounds
+                                                                contentMode:UIViewContentModeScaleAspectFill];
+        self.videoPreview.backgroundColor = [UIColor blackColor];
+        [self.view insertSubview:self.videoPreview belowSubview:_rtcBtn];
+        [[UPAVCapturer sharedInstance] stop];
+        [UPAVCapturer sharedInstance].openDynamicBitrate = YES;
+        [UPAVCapturer sharedInstance].capturerPresetLevel = UPAVCapturerPreset_640x480;
+        [UPAVCapturer sharedInstance].camaraPosition = AVCaptureDevicePositionFront;
+        [UPAVCapturer sharedInstance].videoOrientation = AVCaptureVideoOrientationPortrait;
+        [UPAVCapturer sharedInstance].fps = 20;
+        //观众端连麦不需要 rtmp 推流，所以不要设置 outStreamPath。同时关闭 UPAVCapturer 推流开关。
+        [UPAVCapturer sharedInstance].streamingOn = NO;
+        [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize= CGSizeMake(360, 640);//剪裁为 16 : 9
+        [UPAVCapturer sharedInstance].filterOn = YES;
+        [[UPAVCapturer sharedInstance] start];
+        
+        //需要设置 rtc appId
+        [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
+        //设置连麦的 channelID，UPLiveSDKDemo 中使用推拉流 id 当作 channelID，方便和主播端连麦的配合。
+        NSString *rtcChannelId = [NSURL URLWithString:self.url].pathComponents.lastObject;
+        [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
+        _rtcConnected = YES;
+    });
 }
 
 //采集状态

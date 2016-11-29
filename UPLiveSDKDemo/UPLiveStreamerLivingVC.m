@@ -234,14 +234,13 @@
 - (void)errorAlert:(NSString *)message {
     dispatch_async(dispatch_get_main_queue(), ^(){
         
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
-                                                                       message:message
-                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction * action) {
-                                                                  [self dismissViewControllerAnimated:YES completion:nil];
-                                                              }];
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                [[UPAVCapturer sharedInstance] stop];
+            }];
+        }];
         
         [alert addAction:defaultAction];
         [self presentViewController:alert animated:YES completion:nil];
