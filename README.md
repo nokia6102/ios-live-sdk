@@ -13,14 +13,6 @@
 
 [UPYUN 直播平台自主配置流程](http://docs.upyun.com/live/) 
   
-  
-## SDK下载
-Demo 下载: `https://github.com/upyun/ios-live-sdk`
-
-## 连麦模块 framework 及文档下载
-[连麦文档](https://github.com/upyun/ios-live-sdk/blob/master/README_rtc.md)
-UPRtcSDK.framework 下载：```http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip```
-  
 ## SDK使用说明
 
 ### 运行环境和兼容性
@@ -32,9 +24,9 @@ UPRtcSDK.framework 下载：```http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.
 ### 安装使用说明
 #### pod 安装方法：
 
- `pod 'UPLiveSDK', '~> 3.0'`
+ `pod 'UPLiveSDK', '~> 2.9'`
 
-__注: 如果使用 pod 安装, 需要设置工程 TARGET 和 Pod 里面 UPLiveSDK TARGET ```Enable bitcode```： NO , 不需要添加依赖库.__
+__注: 如果使用 pod 安装, 需要设置 ```Enable bitcode```： NO , 不需要添加依赖库.__
 	
 #### 常规安装方法：
 
@@ -131,6 +123,12 @@ UPLiveService 文件夹
 
 * 支持自动音画同步调整
 
+
+## SDK下载
+Demo 下载: `https://github.com/upyun/ios-live-sdk`
+
+## 连麦模块 framework 及文档下载
+UPRtcSDK.framework 下载：```http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip```
 
 
 
@@ -273,11 +271,16 @@ __10.如何快速体验和测试直播？__
 
 
 
-## 版本历史      			       
+## 版本历史 
+     			       
+__3.1 三人连麦: 2016.12.08__  			
+
+* 美颜滤镜详细等级参数接口
+* iPhone5 bug 修复
+* 支持3人连麦
 
 
-
-__3.0 支持连麦  __更新建议: 建议更新, 2016.11.24__                   
+__3.0 增加动态码率__  __更新建议: 建议更新, 2016.11.10__                   
 	         				
 * 支持直播连麦	
 * bug fix			
