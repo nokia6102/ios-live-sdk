@@ -44,7 +44,7 @@
 @implementation UPLivePlayerVC
 
 - (void)viewDidLoad {
-    [UPLiveSDKConfig setLogLevel:UP_Level_debug];
+    [UPLiveSDKConfig setLogLevel:UP_Level_error];
     self.view.backgroundColor = [UIColor blackColor];
     _activityIndicatorView = [[UIActivityIndicatorView alloc] init];
     _activityIndicatorView = [ [ UIActivityIndicatorView alloc ] initWithFrame:CGRectMake(250.0,20.0,30.0,30.0)];
@@ -310,9 +310,12 @@
     if (sender.tag != 0) {
         sender.tag = 0;
         [sender setTitle:@"连麦" forState:UIControlStateNormal];
-        
         //关闭当前连麦
         [[UPAVCapturer sharedInstance] stop];
+        
+        //观众端连麦结束之后 UPAVCapturer streamingOn 属性最好恢复默认值。避免主播端调用时候 UPAVCapturer 引起无法推流。
+        [UPAVCapturer sharedInstance].streamingOn = YES;
+
         [self.videoPreview removeFromSuperview];
         return;
         
@@ -320,12 +323,10 @@
         sender.tag = 1;
         [sender setTitle:@"关闭连麦" forState:UIControlStateNormal];
     }
-    
     //连麦需要先关掉播放器
     [_player stop];
+    //_player stop 是异步的在 main_queue 执行，无法立即结束。所以需要在 main_queue 下一个 block 中来启动连麦过程。
     
-    
-    //_player stop 是异步执行，无法立即结束。所以需要在 main_queue 下一个 block 中来启动连麦过程。
     dispatch_async(dispatch_get_main_queue(), ^(){
         NSLog(@"开启采集 － 进行连麦");
         //设置代理，采集状态信息回调

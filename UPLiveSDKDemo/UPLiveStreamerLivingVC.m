@@ -73,7 +73,7 @@
     [self.view insertSubview:self.videoPreview atIndex:0];
     
     //开启 debug 信息
-    [UPLiveSDKConfig setLogLevel:UP_Level_debug];
+    [UPLiveSDKConfig setLogLevel:UP_Level_error];
 
     //设置代理，采集状态推流信息回调
     [UPAVCapturer sharedInstance].delegate = self;
@@ -90,10 +90,10 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [self start];
+//    [self beautifyLevelTest];
 }
 
 - (void)start {
-    
     [[UPAVCapturer sharedInstance] stop];
     [UPAVCapturer sharedInstance].openDynamicBitrate = YES;
     [UPAVCapturer sharedInstance].capturerPresetLevel = _settings.level;
@@ -104,7 +104,6 @@
     
     //推流地址
     NSString *rtmpPushUrl = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
-//    rtmpPushUrl = @"rtmp://push.capitalcloud.net/791691368117590174/1";
     //计算 upToken
     NSString *upToken = [UPAVCapturer tokenWithKey:@"passwork"
                                             bucket:@"bucket"
@@ -115,6 +114,7 @@
     rtmpPushUrl = [NSString stringWithFormat:@"%@?_upt=%@", rtmpPushUrl, upToken];
     NSLog(@"rtmpPushUrl: %@", rtmpPushUrl);
     
+    //rtmpPushUrl = @"rmtp://push.live.beibei.com/toutiao/510030";
     
     [UPAVCapturer sharedInstance].outStreamPath = rtmpPushUrl;
     
@@ -136,39 +136,49 @@
     }
     
     
-//    CGSize size = [UIScreen mainScreen].bounds.size;
-//    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
-//    label.text = @"我是水印";
-//    label.textAlignment = NSTextAlignmentRight;
+//        CGSize size = [UIScreen mainScreen].bounds.size;
+//        __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
+//        label.text = @"我是水印";
+//        label.textAlignment = NSTextAlignmentRight;
 //    
-//    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
-//    imgV.image = [UIImage imageNamed:@"upyun_logo"];
+//        UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
+//        imgV.image = [UIImage imageNamed:@"upyun_logo"];
 //    
-//    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
-//    subView.backgroundColor = [UIColor clearColor];
-//    [subView addSubview:label];
-//    [subView addSubview:imgV];
-//    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
-//        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
-//    }];
+//        UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+//        subView.backgroundColor = [UIColor clearColor];
+//        [subView addSubview:label];
+//        [subView addSubview:imgV];
+//        [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
+//            label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
+//        }];
     
     
-    [UPAVCapturer sharedInstance].networkSateBlock = ^(UPAVStreamerNetworkState level) {
-        if (level == UPAVStreamerNetworkState_BAD) {
-            NSLog(@"网络比较差");
-        } else if (level == UPAVStreamerNetworkState_NORMAL) {
-            NSLog(@"网络一般");
-        } else {
-            NSLog(@"网络良好");
-        }
-    };
+//    [UPAVCapturer sharedInstance].networkSateBlock = ^(UPAVStreamerNetworkState level) {
+//        if (level == UPAVStreamerNetworkState_BAD) {
+//            NSLog(@"网络比较差");
+//        } else if (level == UPAVStreamerNetworkState_NORMAL) {
+//            NSLog(@"网络一般");
+//        } else {
+//            NSLog(@"网络良好");
+//        }
+//    };
     
     [[UPAVCapturer sharedInstance] start];
     [self updateDashboard];
 }
 
 - (IBAction)rtcSwitch:(UISwitch *)sender {
+    CGFloat w = [UIScreen mainScreen].bounds.size.width / 4;
+    CGFloat h = [UIScreen mainScreen].bounds.size.height / 4;
+    NSLog(@"%f", [UIScreen mainScreen].bounds.size.width);
+    NSLog(@"%f", [UIScreen mainScreen].bounds.size.height);
+    CGRect frame0 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10, w, h);
+    CGRect frame1 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10 + h, w, h);
+    
     [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
+    [[UPAVCapturer sharedInstance] rtcSetRemoteViewframe:frame0 targetViewIndex:0 defaultShow:YES];
+    [[UPAVCapturer sharedInstance] rtcSetRemoteViewframe:frame1 targetViewIndex:1 defaultShow:NO];
+
     if (sender.on) {
         //设置连麦房间号与推流id一致，方便播放客户端进行连麦
         NSString *rtcChannelId = _settings.streamId;
@@ -234,13 +244,17 @@
 - (void)errorAlert:(NSString *)message {
     dispatch_async(dispatch_get_main_queue(), ^(){
         
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
+                                                                       message:message
+                                                                preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                [[UPAVCapturer sharedInstance] stop];
-            }];
-        }];
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * action) {
+                                                                  
+                                                                  [self dismissViewControllerAnimated:YES completion:^{
+                                                                      [[UPAVCapturer sharedInstance] stop];
+                                                                  }];
+                                                              }];
         
         [alert addAction:defaultAction];
         [self presentViewController:alert animated:YES completion:nil];
@@ -356,6 +370,81 @@
 - (void)dealloc {
 //    NSLog(@"dealloc %@", self);
 }
+
+
+
+#pragma mark 测试
+
+- (void)beautifyLevelTest{
+    UIView *testPanle = [[UIView alloc] initWithFrame:CGRectMake(200, 100, 200, 400)];
+    testPanle.backgroundColor = [UIColor colorWithRed:0./255 green:0./255 blue:0./255 alpha:0.1];
+    
+    
+    for (int index = 0; index < 4; index ++) {
+        UIStepper *Stepper = [[UIStepper alloc] init];
+        Stepper.tag = index;
+        
+        switch (Stepper.tag) {
+            case 0:
+                Stepper.value = 0.6; Stepper.minimumValue = 0;  Stepper.maximumValue = 100; Stepper.stepValue = 0.1;
+                break;
+            case 1:
+                Stepper.value = 4.0; Stepper.minimumValue = 0;  Stepper.maximumValue = 100; Stepper.stepValue = 1;
+                break;
+            case 2:
+                Stepper.value = 1.1; Stepper.minimumValue = 0;  Stepper.maximumValue = 100; Stepper.stepValue = 0.1;
+                break;
+            case 3:
+                Stepper.value = 1.1; Stepper.minimumValue = 0;  Stepper.maximumValue = 100; Stepper.stepValue = 0.1;
+
+                break;
+            default:
+                break;
+        }
+        
+        
+        Stepper.center = CGPointMake(100, 60 * (index + 1));
+        [testPanle addSubview:Stepper];
+        [Stepper addTarget:self action:@selector(beautifyLevelTestStepperTap:) forControlEvents:UIControlEventValueChanged];
+    }
+    
+    [self.view addSubview:testPanle];
+}
+
+- (void)beautifyLevelTestStepperTap:(UIStepper *)sender {
+    /*
+     /// 美颜效果。值越大效果越强。可适当调整
+     @property (nonatomic, assign)CGFloat level;//默认值 0.6
+     /// 磨皮, 双边模糊，平滑处理。值越小效果越强。建议保持默认值。
+     @property (nonatomic, assign)CGFloat bilateralLevel;//默认值 4.0
+     /// 饱和度。值越小画面越灰白，值越大色彩越强烈。可适当调整。
+     @property (nonatomic, assign)CGFloat saturationLevel;//默认值 1.1
+     /// 亮度。值越小画面越暗，值越大越明亮。可适当调整。
+     @property (nonatomic, assign)CGFloat brightnessLevel;//默认值 1.1
+     
+     */
+    
+    NSLog(@"sender.tag : %ld  %f", (long)sender.tag, sender.value);
+    switch (sender.tag) {
+        case 0:[UPAVCapturer sharedInstance].beautifyFilter.level = sender.value;
+            break;
+        case 1:[UPAVCapturer sharedInstance].beautifyFilter.bilateralLevel = sender.value;
+            break;
+        case 2:[UPAVCapturer sharedInstance].beautifyFilter.saturationLevel = sender.value;
+            break;
+        case 3:[UPAVCapturer sharedInstance].beautifyFilter.brightnessLevel = sender.value;
+            break;
+        default:
+            break;
+    }
+    
+    NSLog(@"level %f", [UPAVCapturer sharedInstance].beautifyFilter.level);
+    NSLog(@"bilateralLevel %f", [UPAVCapturer sharedInstance].beautifyFilter.bilateralLevel);
+    NSLog(@"saturationLevel %f", [UPAVCapturer sharedInstance].beautifyFilter.saturationLevel);
+    NSLog(@"brightnessLevel %f", [UPAVCapturer sharedInstance].beautifyFilter.brightnessLevel);
+    [UPAVCapturer sharedInstance].filterOn = YES;
+}
+
 
 
 @end
