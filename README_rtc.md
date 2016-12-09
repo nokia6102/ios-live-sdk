@@ -44,6 +44,7 @@ CoreMedia.framework          // 连麦功能 需要依赖 
 CoreTelephony.framework      // 连麦功能 需要依赖
 SystemConfiguration.framework// 连麦功能 需要依赖
 libc++.tbd                   // 连麦功能 需要依赖
+CoreMotion.framework         // 连麦功能 需要依赖 
 ```
 
 

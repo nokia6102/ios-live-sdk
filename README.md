@@ -128,9 +128,8 @@ UPLiveService 文件夹
 Demo 下载: `https://github.com/upyun/ios-live-sdk`
 
 ## 连麦模块 framework 及文档下载
-UPRtcSDK.framework 下载：```http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip```
-
-
+[README_rtc.md](https://github.com/upyun/ios-live-sdk/blob/master/README_rtc.md)   
+[UPRtcSDK.framework 下载](http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip)
 
 ## 推流 SDK 使用示例 UPAVCapturer
 
