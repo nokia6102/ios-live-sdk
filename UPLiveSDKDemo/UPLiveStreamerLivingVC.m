@@ -150,22 +150,23 @@
             break;
     }
     
-    CGSize size = [UIScreen mainScreen].bounds.size;
-    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
-    label.text = @"我是水印";
-    label.textAlignment = NSTextAlignmentRight;
 
-    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
-    imgV.image = [UIImage imageNamed:@"upyun_logo"];
-
-    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
-    subView.backgroundColor = [UIColor clearColor];
-    [subView addSubview:label];
-    [subView addSubview:imgV];
-    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
-        //动态变化的时间戳
-        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
-    }];
+//    CGSize size = [UIScreen mainScreen].bounds.size;
+//    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
+//    label.text = @"我是水印";
+//    label.textAlignment = NSTextAlignmentRight;
+//
+//    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
+//    imgV.image = [UIImage imageNamed:@"upyun_logo"];
+//
+//    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+//    subView.backgroundColor = [UIColor clearColor];
+//    [subView addSubview:label];
+//    [subView addSubview:imgV];
+//    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
+//        //动态变化的时间戳
+//        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
+//    }];
     
     
 //    [UPAVCapturer sharedInstance].networkSateBlock = ^(UPAVStreamerNetworkState level) {
