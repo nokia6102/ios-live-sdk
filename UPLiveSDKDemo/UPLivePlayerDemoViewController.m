@@ -59,10 +59,10 @@
      http://test86400.b0.upaiyun.com/flv/2016_08_15_16_28_20_853_%2B0800.flv
      http://upyun-live-recorder.b0.upaiyun.com/live.ecook.cn/live/2/recorder20160812202528.mp4
      http://upyun-live-recorder.b0.upaiyun.com/live.ecook.cn/live/2/recorder20160812202528.mp4
+     http://wz.loongscity.com/test1482724992.mp4
      */
     
     textFieldPlayUrl.text = @"rtmp://live.hkstv.hk.lxdns.com/live/hks";
-    
     textFieldPlayUrl.borderStyle = UITextBorderStyleRoundedRect;
     textFieldPlayUrl.font = [UIFont systemFontOfSize:12.0f];
     textFieldPlayUrl.clearButtonMode = UITextFieldViewModeWhileEditing;

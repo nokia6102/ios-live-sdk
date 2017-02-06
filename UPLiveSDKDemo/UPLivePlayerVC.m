@@ -7,7 +7,7 @@
 //
 
 #import "UPLivePlayerVC.h"
-#import <UPLiveSDK/UPAVPlayer.h>
+#import <UPLiveSDKDll/UPAVPlayer.h>
 #import "AppDelegate.h"
 #import "UPAVCapturer.h"
 
@@ -22,6 +22,9 @@
     UILabel *_bufferingProgressLabel;
     BOOL _sliding;
     BOOL _rtcConnected;//是否已连麦
+    UIView *_rtcContainerView;
+
+
 }
 
 @property (weak, nonatomic) IBOutlet UIButton *playBtn;
@@ -33,11 +36,12 @@
 @property (weak, nonatomic) IBOutlet UIButton *rtcBtn;
 
 
-
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicatorView;
 @property (nonatomic, strong) UILabel *bufferingProgressLabel;
 @property (weak, nonatomic) IBOutlet UITextView *dashboardView;
-@property (nonatomic, strong) UIView *videoPreview;//连麦大视图
+@property (nonatomic, strong) UIView *videoPreview;  //连麦本地视图
+@property (nonatomic, strong) UIView *rtcRemoteView0;//连麦远程视图0
+@property (nonatomic, strong) UIView *rtcRemoteView1;//连麦远程视图1
 
 @end
 
@@ -45,6 +49,8 @@
 
 - (void)viewDidLoad {
     [UPLiveSDKConfig setLogLevel:UP_Level_error];
+    [UPLiveSDKConfig setStatistcsOn:YES];
+
     self.view.backgroundColor = [UIColor blackColor];
     _activityIndicatorView = [[UIActivityIndicatorView alloc] init];
     _activityIndicatorView = [ [ UIActivityIndicatorView alloc ] initWithFrame:CGRectMake(250.0,20.0,30.0,30.0)];
@@ -86,12 +92,9 @@
     [self.view addSubview:_bufferingProgressLabel];
     [self.view insertSubview:_rtcBtn atIndex:101];
     
-    
-    
     _player = [[UPAVPlayer alloc] initWithURL:self.url];
     _player.bufferingTime = self.bufferingTime;
     _player.delegate = self;
-    _player.lipSynchOn = NO;
     self.dashboardView.hidden = YES;
     [self updateDashboard];
 }
@@ -122,9 +125,6 @@
 - (void)pause:(id)sender {
     [_player pause];
 }
-
-
-
 
 - (void)info:(id)sender {
     self.dashboardView.hidden =  !self.dashboardView.hidden;
@@ -306,17 +306,22 @@
 }
 
 - (void)rtcStart:(UIButton *)sender {
+    [_rtcContainerView removeFromSuperview];
     // 按钮切换
     if (sender.tag != 0) {
         sender.tag = 0;
         [sender setTitle:@"连麦" forState:UIControlStateNormal];
         //关闭当前连麦
-        [[UPAVCapturer sharedInstance] stop];
+        [[UPAVCapturer sharedInstance] stop];//会自动调用  [[UPAVCapturer sharedInstance] rtcClose]
         
         //观众端连麦结束之后 UPAVCapturer streamingOn 属性最好恢复默认值。避免主播端调用时候 UPAVCapturer 引起无法推流。
         [UPAVCapturer sharedInstance].streamingOn = YES;
-
-        [self.videoPreview removeFromSuperview];
+        //清理连麦视图
+        [_rtcContainerView removeFromSuperview];
+        for(UIView *v in _rtcContainerView.subviews){
+            [v removeFromSuperview];
+        }
+        
         return;
         
     } else {
@@ -334,7 +339,6 @@
         self.videoPreview = [[UPAVCapturer sharedInstance] previewWithFrame:[UIScreen mainScreen].bounds
                                                                 contentMode:UIViewContentModeScaleAspectFill];
         self.videoPreview.backgroundColor = [UIColor blackColor];
-        [self.view insertSubview:self.videoPreview belowSubview:_rtcBtn];
         [[UPAVCapturer sharedInstance] stop];
         [UPAVCapturer sharedInstance].openDynamicBitrate = YES;
         [UPAVCapturer sharedInstance].capturerPresetLevel = UPAVCapturerPreset_640x480;
@@ -344,13 +348,47 @@
         //观众端连麦不需要 rtmp 推流，所以不要设置 outStreamPath。同时关闭 UPAVCapturer 推流开关。
         [UPAVCapturer sharedInstance].streamingOn = NO;
         [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize= CGSizeMake(360, 640);//剪裁为 16 : 9
-        [UPAVCapturer sharedInstance].filterOn = YES;
+        [UPAVCapturer sharedInstance].beautifyOn = YES;
         [[UPAVCapturer sharedInstance] start];
         
         //需要设置 rtc appId
+        
+//        CGFloat w = [UIScreen mainScreen].bounds.size.width / 4;
+//        CGFloat h = [UIScreen mainScreen].bounds.size.height / 4;
+        CGFloat w = 240 / 2.;
+        CGFloat h = 320 / 2.;
+        
+        
+        
+        NSLog(@"%f", [UIScreen mainScreen].bounds.size.width);
+        NSLog(@"%f", [UIScreen mainScreen].bounds.size.height);
+        CGRect frame_main = [UIScreen mainScreen].bounds;
+        CGRect frame0 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10, w, h);
+        CGRect frame1 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10 + h, w, h);
+        _rtcContainerView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        _rtcContainerView.backgroundColor = [UIColor blackColor];
+        [self.view insertSubview:_rtcContainerView belowSubview:_rtcBtn];
+        
         [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
+        [[UPAVCapturer sharedInstance] rtcSetViewMode:1];//观众连麦模式
+        self.rtcRemoteView0 = [[UPAVCapturer sharedInstance] rtcRemoteView0WithFrame:frame_main];//显示主播画面
+        self.rtcRemoteView1 = [[UPAVCapturer sharedInstance] rtcRemoteView1WithFrame:frame1];//显示另外一个连麦嘉宾画面
+        self.videoPreview.frame = frame0;//显示自己画面
+
+        
+        //将相关视频窗口，添加到_rtcContainerView。
+        
+        UIView *testView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+        testView.backgroundColor = [UIColor redColor];
+        
+        [_rtcContainerView addSubview:self.rtcRemoteView0];//大视图放置在第一层
+        [_rtcContainerView addSubview:self.videoPreview];
+        [_rtcContainerView addSubview:self.rtcRemoteView1];
+        self.rtcRemoteView0.hidden = NO;//rtcRemoteView0 默认显示
+        self.rtcRemoteView1.hidden = YES;//rtcRemoteView1 默认隐藏, 后面随着新 uid 进入房间而动态显示
         //设置连麦的 channelID，UPLiveSDKDemo 中使用推拉流 id 当作 channelID，方便和主播端连麦的配合。
         NSString *rtcChannelId = [NSURL URLWithString:self.url].pathComponents.lastObject;
+        
         [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
         _rtcConnected = YES;
     });
@@ -379,6 +417,44 @@
 
 - (void)capturer:(UPAVCapturer *)capturer capturerError:(NSError *)error {
     NSLog(@"视频采集错误！%@",  error);
+}
+
+//有人进房间，动态处理三人连麦窗口
+- (void)capturer:(UPAVCapturer *)capturer rtcDidJoinedOfUid:(NSUInteger)uid{
+    
+    NSLog(@"rtcDidJoinedOfUid uid %ld", uid);
+    NSLog(@"rtcDidJoinedOfUid rtcRemoteView0 %ld", self.rtcRemoteView0.tag);
+    NSLog(@"rtcDidJoinedOfUid rtcRemoteView1 %ld", self.rtcRemoteView1.tag);
+    
+    if (uid == self.rtcRemoteView0.tag) {
+        self.rtcRemoteView0.hidden = NO;
+    }
+    
+    if (uid == self.rtcRemoteView1.tag) {
+        self.rtcRemoteView1.hidden = NO;
+    }
+}
+
+//有人出房间，动态处理三人连麦窗口
+- (void)capturer:(UPAVCapturer *)capturer rtcDidOfflineOfUid:(NSUInteger)uid reason:(NSUInteger)reason{
+    
+    NSLog(@"rtcDidOfflineOfUid uid %ld", uid);
+    NSLog(@"rtcDidOfflineOfUid rtcRemoteView0 %ld", self.rtcRemoteView0.tag);
+    NSLog(@"rtcDidOfflineOfUid rtcRemoteView1 %ld", self.rtcRemoteView1.tag);
+    
+    if (uid == self.rtcRemoteView0.tag) {
+        self.rtcRemoteView0.hidden = YES;
+    }
+    
+    if (uid == self.rtcRemoteView1.tag) {
+        self.rtcRemoteView1.hidden = YES;
+    }
+    
+    //如果对方全部退出后，将rtcRemoteView0 显示出来（黑屏），代表嘉宾在连麦状态（等待连麦）
+    if (self.rtcRemoteView0.hidden && self.rtcRemoteView1.hidden) {
+        self.rtcRemoteView0.hidden = NO;
+    }
+
 }
 
 

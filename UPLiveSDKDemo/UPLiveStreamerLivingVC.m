@@ -9,8 +9,8 @@
 #import "UPLiveStreamerLivingVC.h"
 #import "UPAVCapturer.h"
 #import "AppDelegate.h"
-#import <UPLiveSDK/UPLiveSDKConfig.h>
-#import <UPLiveSDK/UPAVPlayer.h>
+#import <UPLiveSDKDll/UPLiveSDKConfig.h>
+#import <UPLiveSDKDll/UPAVPlayer.h>
 
 
 @interface UPLiveStreamerLivingVC () <UPAVCapturerDelegate>
@@ -18,6 +18,7 @@
     NSString *_videoOrientationDescription;
     NSString *_pushStreamStadusDescription;
     UPAVPlayer *_bgmPlayer;
+
 }
 @property (weak, nonatomic) IBOutlet UISwitch *mixerSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *beauytifySwitch;
@@ -25,10 +26,13 @@
 @property (weak, nonatomic) IBOutlet UISwitch *cameraSwitch;
 @property (weak, nonatomic) IBOutlet UIView *panel;
 @property (weak, nonatomic) IBOutlet UITextView *dashboard;
-@property (nonatomic, strong) UIView *videoPreview;
 @property (nonatomic, strong) UILabel *descriptionLabel;
 @property (nonatomic, assign) CGFloat lastScale;
 @property (nonatomic, assign) NSInteger filterCode;
+@property (nonatomic, strong) UIView *videoPreview;  //本地预览视图
+@property (nonatomic, strong) UIView *rtcRemoteView0;//连麦远程视图0
+@property (nonatomic, strong) UIView *rtcRemoteView1;//连麦远程视图1
+
 
 @end
 
@@ -42,8 +46,20 @@
         previewContentMode = UIViewContentModeScaleAspectFill;
     }
     
-    self.videoPreview = [[UPAVCapturer sharedInstance] previewWithFrame:[UIScreen mainScreen].bounds
+    
+    
+    float w = [UIScreen mainScreen].bounds.size.width;
+    float h = [UIScreen mainScreen].bounds.size.height;
+    
+    if (_settings.videoOrientation != AVCaptureVideoOrientationPortrait) {
+        //横屏拍摄时候，宽是长边
+        w = MAX([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
+        h = MIN([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
+
+    }
+    self.videoPreview = [[UPAVCapturer sharedInstance] previewWithFrame:CGRectMake(0, 0, w, h)
                                                             contentMode:previewContentMode];
+    
     self.videoPreview.backgroundColor = [UIColor blackColor];
     
     //横竖屏拍摄提示 label
@@ -74,6 +90,7 @@
     
     //开启 debug 信息
     [UPLiveSDKConfig setLogLevel:UP_Level_error];
+    [UPLiveSDKConfig setStatistcsOn:YES];
 
     //设置代理，采集状态推流信息回调
     [UPAVCapturer sharedInstance].delegate = self;
@@ -101,7 +118,7 @@
     [UPAVCapturer sharedInstance].camaraTorchOn = _settings.camaraTorchOn;
     [UPAVCapturer sharedInstance].videoOrientation = _settings.videoOrientation;
     [UPAVCapturer sharedInstance].fps = _settings.fps;
-    
+
     //推流地址
     NSString *rtmpPushUrl = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
     //计算 upToken
@@ -112,10 +129,7 @@
                                         streamName:_settings.streamId];
     
     rtmpPushUrl = [NSString stringWithFormat:@"%@?_upt=%@", rtmpPushUrl, upToken];
-    NSLog(@"rtmpPushUrl: %@", rtmpPushUrl);
-    
-    //rtmpPushUrl = @"rmtp://push.live.beibei.com/toutiao/510030";
-    
+    NSLog(@"设置推流地址: %@", rtmpPushUrl);
     [UPAVCapturer sharedInstance].outStreamPath = rtmpPushUrl;
     
     // 要调节成 16:9 的比例, 可以自行调整要裁剪的大小
@@ -125,7 +139,8 @@
             [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize = CGSizeMake(360, 480);
             break;
         case UPAVCapturerPreset_640x480:
-            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize= CGSizeMake(360, 640);//剪裁为 16 : 9
+            //剪裁为 16 : 9, 注意：横屏时候需要设置为 CGSizeMake(640, 360)
+            [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize= CGSizeMake(360, 640);
             break;
         case UPAVCapturerPreset_960x540:
             [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize = CGSizeMake(540, 960);
@@ -134,7 +149,6 @@
             [UPAVCapturer sharedInstance].capturerPresetLevelFrameCropSize = CGSizeMake(720, 1280);
             break;
     }
-    
     
 //        CGSize size = [UIScreen mainScreen].bounds.size;
 //        __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
@@ -168,21 +182,32 @@
 }
 
 - (IBAction)rtcSwitch:(UISwitch *)sender {
-    CGFloat w = [UIScreen mainScreen].bounds.size.width / 4;
-    CGFloat h = [UIScreen mainScreen].bounds.size.height / 4;
+    
+    //连麦小视图视频分辨率是：320 ＊ 240
+    CGFloat w = 240 / 2.;
+    CGFloat h = 320 / 2.;
+    
     NSLog(@"%f", [UIScreen mainScreen].bounds.size.width);
     NSLog(@"%f", [UIScreen mainScreen].bounds.size.height);
     CGRect frame0 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10, w, h);
     CGRect frame1 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10 + h, w, h);
-    
+
     [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
-    [[UPAVCapturer sharedInstance] rtcSetRemoteViewframe:frame0 targetViewIndex:0 defaultShow:YES];
-    [[UPAVCapturer sharedInstance] rtcSetRemoteViewframe:frame1 targetViewIndex:1 defaultShow:NO];
+    [[UPAVCapturer sharedInstance] rtcSetViewMode:0];//主播模式连麦
+
+    self.rtcRemoteView0 = [[UPAVCapturer sharedInstance] rtcRemoteView0WithFrame:frame0];//显示第一个连麦嘉宾画面
+    self.rtcRemoteView1 = [[UPAVCapturer sharedInstance] rtcRemoteView1WithFrame:frame1];//显示第二个连麦嘉宾画面
+    
+    [self.videoPreview addSubview:self.rtcRemoteView0];
+    [self.videoPreview addSubview:self.rtcRemoteView1];
+    self.rtcRemoteView0.hidden = NO;//连麦开始，第一个小视图默认显示。
+    self.rtcRemoteView1.hidden = YES;//连麦开始，第二个小视图默认隐藏。后面随着新 uid 进入房间而动态显示。
 
     if (sender.on) {
         //设置连麦房间号与推流id一致，方便播放客户端进行连麦
         NSString *rtcChannelId = _settings.streamId;
         int ret = [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
+        
         if (ret == -1) {
             [self errorAlert:@"连麦功能需要安装连麦模块：UPRtcSDK.framework"];
         }
@@ -191,6 +216,9 @@
         }
     } else {
         [[UPAVCapturer sharedInstance] rtcClose];
+        //清理远程视图
+        [self.rtcRemoteView0 removeFromSuperview];
+        [self.rtcRemoteView1 removeFromSuperview];
     }
 }
 
@@ -211,7 +239,7 @@
 
 - (IBAction)beautifySwitch:(id)sender {
     UISwitch *item = sender;
-    [UPAVCapturer sharedInstance].filterOn = item.on;
+    [UPAVCapturer sharedInstance].beautifyOn = item.on;
 }
 
 - (IBAction)cameraSwitch:(id)sender {
@@ -356,6 +384,46 @@
     self.descriptionLabel.text = [NSString stringWithFormat:@"%@%@", _videoOrientationDescription, _pushStreamStadusDescription];
 }
 
+
+//有人进房间，动态处理三人连麦窗口
+- (void)capturer:(UPAVCapturer *)capturer rtcDidJoinedOfUid:(NSUInteger)uid{
+    NSLog(@"rtcDidJoinedOfUid uid %ld", uid);
+    NSLog(@"rtcDidJoinedOfUid rtcRemoteView0 %ld", self.rtcRemoteView0.tag);
+    NSLog(@"rtcDidJoinedOfUid rtcRemoteView1 %ld", self.rtcRemoteView1.tag);
+    
+    
+    if (uid == self.rtcRemoteView0.tag) {
+        self.rtcRemoteView0.hidden = NO;
+    }
+    
+    if (uid == self.rtcRemoteView1.tag) {
+        self.rtcRemoteView1.hidden = NO;
+    }
+}
+
+//有人出房间，动态处理三人连麦窗口
+- (void)capturer:(UPAVCapturer *)capturer rtcDidOfflineOfUid:(NSUInteger)uid reason:(NSUInteger)reason{
+    
+    NSLog(@"rtcDidOfflineOfUid uid %ld", uid);
+    NSLog(@"rtcDidOfflineOfUid rtcRemoteView0 %ld", self.rtcRemoteView0.tag);
+    NSLog(@"rtcDidOfflineOfUid rtcRemoteView1 %ld", self.rtcRemoteView1.tag);
+    
+    if (uid == self.rtcRemoteView0.tag) {
+        self.rtcRemoteView0.hidden = YES;
+    }
+    
+    if (uid == self.rtcRemoteView1.tag) {
+        self.rtcRemoteView1.hidden = YES;
+    }
+    
+    //如果对方全部退出后，将rtcRemoteView0 显示出来（黑屏），代表主播在连麦状态（等待连麦）
+    if (self.rtcRemoteView0.hidden && self.rtcRemoteView1.hidden) {
+        self.rtcRemoteView0.hidden = NO;
+    }
+}
+
+
+
 - (void)updateDashboard{
     self.dashboard.text = [NSString stringWithFormat:@"%@", [UPAVCapturer sharedInstance].dashboard];
     self.dashboard.textColor = [UIColor redColor];
@@ -421,7 +489,6 @@
      @property (nonatomic, assign)CGFloat saturationLevel;//默认值 1.1
      /// 亮度。值越小画面越暗，值越大越明亮。可适当调整。
      @property (nonatomic, assign)CGFloat brightnessLevel;//默认值 1.1
-     
      */
     
     NSLog(@"sender.tag : %ld  %f", (long)sender.tag, sender.value);
@@ -442,9 +509,29 @@
     NSLog(@"bilateralLevel %f", [UPAVCapturer sharedInstance].beautifyFilter.bilateralLevel);
     NSLog(@"saturationLevel %f", [UPAVCapturer sharedInstance].beautifyFilter.saturationLevel);
     NSLog(@"brightnessLevel %f", [UPAVCapturer sharedInstance].beautifyFilter.brightnessLevel);
-    [UPAVCapturer sharedInstance].filterOn = YES;
+    [UPAVCapturer sharedInstance].beautifyOn = YES;
 }
 
 
+//横竖屏设置
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    if (_settings.videoOrientation == AVCaptureVideoOrientationPortrait) {
+        return UIInterfaceOrientationMaskPortrait;
+    } else {
+        return UIInterfaceOrientationMaskLandscapeRight;
+    }
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+    if (_settings.videoOrientation == AVCaptureVideoOrientationPortrait) {
+        return UIInterfaceOrientationPortrait;
+    } else {
+        return UIInterfaceOrientationLandscapeRight;
+    }
+}
 
 @end

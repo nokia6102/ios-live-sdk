@@ -1,9 +1,10 @@
-# 又拍云 iOS 推拉流,直播 SDK 使用说明
+# 又拍云 iOS 直播 SDK(动态库) 使用说明   
+*** 注: 从4.0.0版本之后 SDK 改为了动态库形式。 ***
 
 
-## SDK 概述
+## SDK 概述     
 
-此 `SDK` 包含__推流__和__拉流__两部分，及美颜滤镜，连麦等全套直播功能；
+此 `SDK` 包含推流和拉流两部分，及美颜滤镜，连麦等全套直播功能；
        
 
 此 `SDK` 中的播放器、采集器、推流器可单独使用。用户可以自主构建直播中某个环节，比如播放器（`UPAVPlayer`）可以与 Web 推流器 Flex 相配合。推流器（`UPAVStreamer`）可以配合系统自带的AVCapture 或者`GPUImage `库提供的采集功能。 
@@ -17,18 +18,14 @@
 
 ### 运行环境和兼容性
 
-```UPLiveSDK.framework``` 支持 `iOS 8` 及以上系统版本； 
+```UPLiveSDKDll.framework``` 支持 `iOS 8` 及以上系统版本； 
 	
-支持 `ARMv7`，`ARM64`，`x86_64` 架构。
+支持 `ARMv7`，`ARM64` 架构。请使用真机进行开发和测试。
 
 ### 安装使用说明
-#### pod 安装方法：
 
- `pod 'UPLiveSDK', '~> 2.9'`
-
-__注: 如果使用 pod 安装, 需要设置 ```Enable bitcode```： NO , 不需要添加依赖库.__
 	
-#### 常规安装方法：
+#### 手动安装方法：
 
 直接将 `UPLiveService`文件夹拖拽到目标工程目录。
 
@@ -36,16 +33,20 @@ __注: 如果使用 pod 安装, 需要设置 ```Enable bitcode```： NO , 不需
 //文件结构：
 
 UPLiveService 文件夹
-├── GPUImage              //视频处理依赖第三方库 GPUImage  
-├── UPAVCapturer          //UPAVCapturer 音视频采集模块
-└── UPLiveSDK.framework   //framework 包含播放器`UPAVPlayer`和推流器`UPAVStreamer`
+├── GPUImage                 //视频处理依赖第三方库 GPUImage  
+├── UPAVCapturer             //UPAVCapturer 音视频采集模块, 直播接口。
+└── UPLiveSDKDll.framework   //framework 包含播放器`UPAVPlayer`和推流器`UPAVStreamer`
 
 ```
 
 #### 工程设置：     
 
-```Enable bitcode```： NO     
- 
+```TARGET -> Build Settings -> Enable bitcode```： 设置为 NO  			
+
+
+```TARGET -> General -> Embedded Binaries```： 添加选择 UPLiveSDKDll.framework			
+
+
 
 #### 工程依赖：
 
@@ -67,13 +68,23 @@ UPLiveService 文件夹
 
 `libz.tbd`
 
+`CoreMedia.framework`
 
-***注意: 此 `SDK` 已经包含 `FFMPEG 3.0` , 不建议用户自行再添加 `FFMPEG` 库 , 如有特殊需求, 请联系我们***    
+`CoreTelephony.framework`
+
+`SystemConfiguration.framework`
+
+`libc++.tbd`
+
+`CoreMotion.framework`
+
+
+
+***注意: 此 `SDK` 已经包含 `FFMPEG 3.0` , 不建议自行再添加 `FFMPEG` 库 , 如有特殊需求, 请联系我们***    
 
 
 ## 推流端功能特性 （采集器 ＋ 推流器）
 
-* 集成音频和视频采集模块 `AVCaptureSession`
 
 * 音频编码：`AAC` 
 
@@ -84,8 +95,6 @@ UPLiveService 文件夹
 * 推流协议：`RTMP`
 
 * 支持前后置摄像头切换
-
-* 支持闪光灯开关
 
 * 支持目标码率设置		
 
@@ -127,10 +136,6 @@ UPLiveService 文件夹
 ## SDK下载
 Demo 下载: `https://github.com/upyun/ios-live-sdk`
 
-## 连麦模块 framework 及文档下载
-[README_rtc.md](https://github.com/upyun/ios-live-sdk/blob/master/README_rtc.md)   
-[UPRtcSDK.framework 下载](http://test86400.b0.upaiyun.com/livesdk/UPRtcSDK.zip)
-
 ## 推流 SDK 使用示例 UPAVCapturer
 
 使用__拍摄和推流__功能需要引入头文件  `#import "UPAVCapturer.h"`  
@@ -139,7 +144,7 @@ Demo 下载: `https://github.com/upyun/ios-live-sdk`
 
 	
 	
-__注:__ ``UPLiveSDK.framework``中的推流器 `UPAVStreamer`也可以单独使用。`UPAVStreamer`可以配合任何采集器来推流原始的或者经过编码压缩的音视频数据。
+__注:__ ``UPLiveSDKDll.framework``中的推流器 `UPAVStreamer`也可以单独使用。`UPAVStreamer`可以配合任何采集器来推流原始的或者经过编码压缩的音视频数据。
 
 
 1.设置视频预览视图:  
@@ -175,7 +180,7 @@ __注:__ ``UPLiveSDK.framework``中的推流器 `UPAVStreamer`也可以单独使
 
 ## 拉流 SDK 使用示例 UPAVPlayer
 
-使用 ```UPAVPlayer``` 需要引入头文件 ```#import <UPLiveSDK/UPAVPlayer.h>```
+使用 ```UPAVPlayer``` 需要引入头文件 ```#import <UPLiveSDKDll/UPAVPlayer.h>```
 
 `UPAVPlayer` 使用接口类似 `AVFoundation` 的 `AVPlayer` 。
 
@@ -218,7 +223,7 @@ __1.推流、拉流是什么意思？__
 推流是指采集端将音视频流推送到直播服务器的过程；	
 拉流是指从直播服务器获取音视频数据的过程。
 
-__2.UPLiveSDK.framework 中的 UPAVCapturer、UPAVStreamer、UPAVPlayer 作用及之间的关系？__
+__2.UPLiveSDKDll.framework 中的 UPAVCapturer、UPAVStreamer、UPAVPlayer 作用及之间的关系？__
 
 UPAVPlayer 是播放器，可以播放点播或直播流；		
 UPAVStreamer 是推流器，可以将音视频流推到直播服务器上;            
@@ -264,26 +269,32 @@ __9.可不可以仅直播声音不传图像？__
 
 __10.如何快速体验和测试直播？__
 
-下载 demo 工程运行后，便可以直接进行直播测试。        
+下载 demo 工程运行后，便可以直接进行直播测试。  
 
-如果需要自主注册直播云服务可以参考：[UPYUN 直播平台自主配置流程](http://docs.upyun.com/live/) 
+      
+
+__[注]__ 如果需要自主注册直播云服务可以参考：[UPYUN 直播平台自主配置流程](http://docs.upyun.com/live/)       
+__[注]__  如果需要在产品中正式使用连麦功能，请联系申请 ``` rtc appid ```, 可以参考 ``` README_rtc.md ``` 熟悉连麦直播流程。
 
 
 
 ## 版本历史 
+
+__4.0.0  改为动态库，连麦功能完善。 建议更新 2017.02.06__  
+
+
+* 修改为动态库，以避免 ffmpeg 冲突       
+* 集成连麦模块，支持三人连麦的详细 demo    
+* 修复自动重连，来电打断等 bug 
+* __[注意]__ 需要新添加几个系统依赖（用于连麦功能，参考: _工程依赖_）     
+* __[注意]__ 需要添加 Embedded Binaries（动态库，参考: _工程设置_）
+
+  
+
      			       
 __3.1 三人连麦: 2016.12.08__  			
 
-* 美颜滤镜详细等级参数接口
-* iPhone5 bug 修复
-* 支持3人连麦
-
-
-__3.0 增加动态码率__  __更新建议: 建议更新, 2016.11.10__                   
-	         				
-* 支持直播连麦	
-* bug fix			
-
+__3.0 支持直播连麦__  __更新建议: 建议更新, 2016.11.10__                   
 
 __2.9 增加动态码率__  __更新建议: 建议更新, 2016.11.3__
 
@@ -299,83 +310,32 @@ __2.7 增加直播混音功能__  __更新建议: 建议更新, 2016.10.14__
 
 * 播放器新加实时播放 `PCM` 数据的接口，可用于混音或者音频可视化
 * 音频采集模块升级为 `AudioGraph` 实现，新加混音接口, 可实现类似映客的唱歌功能
-* `Swift` 适配, 可以在 `Swift` 工程直接使用 `UPLiveSDK.framework`.
+* `Swift` 适配, 可以在 `Swift` 工程直接使用 `UPLiveSDKDll.framework`.
 * __[注意]__  `UPAVPlayerDelegate`、`UPAVStreamerDelegate`、`UPAVCapturerDelegate` 方法名变动.
 * bug fix 
 
 __2.6 bug 修复__  __更新建议: 建议更新, 2016.9.22__
 
-* 增加了水印接口, 网络波动 `block` 等更友好的处理.
-* 修复重复多次开关引起的 `bug` .
-
-
 __2.5 降噪功能优化__   __更新建议: 非强制性, 如果对环境噪音要求比较高的可以更新__
-
-* 优化降噪功能效果
-* 增加 `pod` 安装方式
-* bug fix
 
 __2.4 降噪功能__
 
-* 采集器结构调整;
-* 采集器添加更丰富的视频滤镜;
-* 修复单音频点播的 seek bug;
-* 音频采集的处理，增益降噪等接口;
-
 __2.3 单音频推流__
 
-* 增加播放端对 hevc (h.265) 格式的支持;
-* 增加单音频推流功能;
-* 增加直播静音功能;
-* 增加拍摄 zoom 功能;
-* 修复横屏拍摄和屏幕旋转 bug;
+__2.2 采集部分以源码展示__        
 
-__2.2 采集部分以源码展示__
+* 采集模块开源（包含音视频采集，GpuImage 处理，混音相关代码）
 
-* UPAVCapturer 以源码展示，方便更灵活的配置功能;
-* 性能提高;
-* fix bug;
 
 __2.1 包尺寸显著减小；支持后台推流；支持浏览器 Flex 推流的播放__
 
-* UPLiveSDK.framework 大小精简到 24M；		
-* 播放器支持单音频播放；				
-* 播放器支持 speex 格式解码，实现配合浏览器 Flex 推流的播放；         
-* 推流支持自由剪裁像素尺寸，如 640*360 的全屏尺寸；    
-* 推流支持后台推流（音频），应用退出后台推流不会中断；     
-* 推流添加水印功能及 demo 展示；
-
 __1.0.4 分析统计，拆分 UPAVStreamer__
  	
- * 播放器添加播放质量分析统计功能；     
- * 播放器添加帧频，码率等信息接口及 demo 展示；     
- * SDK 内部删除 GPUImage 依赖，美颜滤镜功能通过协议接口暴露；     
- * 推流器拆分暴露 UPAVStreamer，方便自由组织实现采集，处理，编码，推流等直播各个环节；      
- * 推流器 UPAVCapturer 状态回调改为代理方式，且细分推流状态和拍摄状态；         
- * 推流器添加拍摄帧频，推流帧频，码率，丢帧等信息接口及 demo 展示；     
- * 推流过程支持背景音乐不被打断及修复 AVAudioSession 相关bug；
-
 __1.0.3 点播支持__
- 	
- * 播放器点播，支持暂停和 seek 功能；
- * 播放器播放、连接逻辑分离，支持异步预连接和缓冲；
- * 播放器状态 delegate 方式回调；
- * 推流器解决 iPhone 6s 音频采集引起相关的 bug；
- * 推流器横屏拍摄及屏幕旋转适配 demo。
 
 __1.0.2 性能优化，添加美颜滤镜__
  	
- * 推流添加美颜滤镜； 
- * 缩小 framework 打包体积；	
- * 修复播放器清晰度 bug；		
- * 修复播放器开始播放花屏 bug；	
- * 修改播放器卡顿重新连接逻辑；	
- * 播放器秒开优化。
-
 __1.0.1 基本的直播推流器和播放器；__  
- 
- * 播放器支持 rtmp, hls, flv;
- * 推流器支持 rtmp 推流。  
  
 ## 反馈与建议
 
