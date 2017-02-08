@@ -260,48 +260,46 @@
 
 /// 横屏旋转和前置拍摄镜面效果
 - (void)needFlip {
+    BOOL needRotation = NO;
     
-    //更换了横屏拍摄模式，这段代码废弃。现在的横屏拍摄模式需要 vc 的横屏配合实现。
-
-//    BOOL needRotation = NO;
-//    
-//    float  pviewOrientation_ = 0;
-//    float  videoOrientation_ = 0;
-//    switch (_previewOrientation) {
-//        case UIInterfaceOrientationUnknown: pviewOrientation_ =  0;
-//            break;
-//        case UIInterfaceOrientationPortrait: pviewOrientation_ =  0;
-//            break;
-//        case UIInterfaceOrientationPortraitUpsideDown: pviewOrientation_ =  M_PI;
-//            break;
-//        case UIInterfaceOrientationLandscapeLeft: pviewOrientation_ =  M_PI_2;
-//            break;
-//        case UIInterfaceOrientationLandscapeRight: pviewOrientation_ = - M_PI_2;
-//            break;
-//        default: pviewOrientation_ =  0;
-//            break;
-//    }
-//    
-//    switch (_videoOrientation) {
-//        case AVCaptureVideoOrientationPortrait: videoOrientation_ =  0;
-//            break;
-//        case UIInterfaceOrientationPortraitUpsideDown: videoOrientation_ =  M_PI;
-//            break;
-//        case UIInterfaceOrientationLandscapeLeft: videoOrientation_ =  M_PI_2;
-//            break;
-//        case UIInterfaceOrientationLandscapeRight: videoOrientation_ = - M_PI_2;
-//            break;
-//        default: videoOrientation_ =  0;
-//            break;
-//    }
-//    
-//    if (pviewOrientation_ != videoOrientation_) {
-//        needRotation = YES;
-//    }
-//    
-//    if (needRotation) {
-//        
-//        
+    float  pviewOrientation_ = 0;
+    float  videoOrientation_ = 0;
+    switch (_previewOrientation) {
+        case UIInterfaceOrientationUnknown: pviewOrientation_ =  0;
+            break;
+        case UIInterfaceOrientationPortrait: pviewOrientation_ =  0;
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown: pviewOrientation_ =  M_PI;
+            break;
+        case UIInterfaceOrientationLandscapeLeft: pviewOrientation_ =  M_PI_2;
+            break;
+        case UIInterfaceOrientationLandscapeRight: pviewOrientation_ = - M_PI_2;
+            break;
+        default: pviewOrientation_ =  0;
+            break;
+    }
+    
+    switch (_videoOrientation) {
+        case AVCaptureVideoOrientationPortrait: videoOrientation_ =  0;
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown: videoOrientation_ =  M_PI;
+            break;
+        case UIInterfaceOrientationLandscapeLeft: videoOrientation_ =  M_PI_2;
+            break;
+        case UIInterfaceOrientationLandscapeRight: videoOrientation_ = - M_PI_2;
+            break;
+        default: videoOrientation_ =  0;
+            break;
+    }
+    
+    if (pviewOrientation_ != videoOrientation_) {
+        needRotation = YES;
+    }
+    
+    if (needRotation) {
+        
+//更换了横屏拍摄模式，这段代码废弃。现在的横屏拍摄模式需要 vc 的横屏配合实现。
+        
 //        float deltaR = pviewOrientation_ - videoOrientation_;
 //        _gpuImageView.transform = CGAffineTransformMakeRotation(deltaR);
 //        //长宽需要对调
@@ -309,7 +307,7 @@
 //            CGRect oldRect = _gpuImageView.frame;
 //            _gpuImageView.frame = CGRectMake(0, 0, oldRect.size.height, oldRect.size.width);
 //        }
-//    }
+    }
     
     BOOL needFlip = NO;
     if (_camaraPosition == AVCaptureDevicePositionFront) {

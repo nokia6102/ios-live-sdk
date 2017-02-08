@@ -23,9 +23,8 @@
     BOOL _sliding;
     BOOL _rtcConnected;//是否已连麦
     UIView *_rtcContainerView;
-
-
 }
+
 
 @property (weak, nonatomic) IBOutlet UIButton *playBtn;
 @property (weak, nonatomic) IBOutlet UIButton *pauseBtn;
@@ -50,7 +49,7 @@
 - (void)viewDidLoad {
     [UPLiveSDKConfig setLogLevel:UP_Level_error];
     [UPLiveSDKConfig setStatistcsOn:YES];
-
+    
     self.view.backgroundColor = [UIColor blackColor];
     _activityIndicatorView = [[UIActivityIndicatorView alloc] init];
     _activityIndicatorView = [ [ UIActivityIndicatorView alloc ] initWithFrame:CGRectMake(250.0,20.0,30.0,30.0)];
@@ -72,7 +71,6 @@
     
     [_rtcBtn addTarget:self action:@selector(rtcStart:) forControlEvents:UIControlEventTouchUpInside];
     
-    
     _bufferingProgressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 60, 40)];
     _bufferingProgressLabel.backgroundColor = [UIColor clearColor];
     _bufferingProgressLabel.textColor = [UIColor lightTextColor];
@@ -80,11 +78,12 @@
     _playProgressSlider.minimumValue = 0;
     _playProgressSlider.maximumValue = 0;
     _playProgressSlider.value = 0;
-    _playProgressSlider.continuous = NO;
-    [_playProgressSlider addTarget:self action:@selector(valueChange:) forControlEvents:(UIControlEventTouchUpInside)];
-    [_playProgressSlider addTarget:self action:@selector(valueChange:) forControlEvents:(UIControlEventTouchUpOutside)];
-    [_playProgressSlider addTarget:self action:@selector(touchDown:) forControlEvents:(UIControlEventTouchDown)];
-
+    _playProgressSlider.continuous = YES;
+    [_playProgressSlider addTarget:self action:@selector(progressSliderSeekTime:) forControlEvents:(UIControlEventTouchUpInside)];
+    [_playProgressSlider addTarget:self action:@selector(progressSliderSeekTime:) forControlEvents:(UIControlEventTouchUpOutside)];
+    [_playProgressSlider addTarget:self action:@selector(progressSliderTouchDown:) forControlEvents:(UIControlEventTouchDown)];
+    [_playProgressSlider addTarget:self action:@selector(progressSliderValueChanged:) forControlEvents:(UIControlEventValueChanged)];
+    
     [self.view addSubview:_activityIndicatorView];
     [self.view addSubview:_playBtn];
     [self.view addSubview:_stopBtn];
@@ -100,10 +99,10 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-
+    
     self.view.frame = [UIScreen mainScreen].bounds;
     [_player setFrame:[UIScreen mainScreen].bounds];
-
+    
     [self.view insertSubview:_player.playView atIndex:0];
     _activityIndicatorView.center = CGPointMake(_player.playView.center.x - 30, _player.playView.center.y);
     _bufferingProgressLabel.center = CGPointMake(_player.playView.center.x + 30, _player.playView.center.y);
@@ -144,17 +143,16 @@
     [string appendString:[NSString stringWithFormat:@"aCachedFrames: %d \n", _player.dashboard.aCachedFrames]];
     [string appendString:[NSString stringWithFormat:@"vDecodedFrames: %d  key:%d\n", _player.dashboard.decodedVFrameNum,  _player.dashboard.decodedVKeyFrameNum]];
     [string appendString:[NSString stringWithFormat:@"aDecodedFrames: %d \n", _player.dashboard.decodedAFrameNum]];
-
+    
     
     for (NSString *key in _player.streamInfo.descriptionInfo.allKeys) {
         [string appendString:[NSString stringWithFormat:@"%@: %@ \n", key, _player.streamInfo.descriptionInfo[key]]];
     }
-
+    
     self.dashboardView.text = string;
     self.dashboardView.textColor = [UIColor whiteColor];
     
     double delayInSeconds = 1.0;
-    
     __weak UPLivePlayerVC *weakself = self;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
@@ -173,12 +171,16 @@
     }
 }
 
--(void)touchDown:(UISlider *)slider{
+-(void)progressSliderTouchDown:(UISlider *)slider{
     _sliding = YES;
 }
 
--(void)valueChange:(UISlider *)slider_{
-    NSLog(@"slider value : %.2f", slider_.value);
+-(void)progressSliderValueChanged:(UISlider *)slider{
+    self.timelabel.text = [NSString stringWithFormat:@"%.0f / %.0f", slider.value, _player.streamInfo.duration];
+}
+
+-(void)progressSliderSeekTime:(UISlider *)slider_{
+    NSLog(@"progressSliderSeekTime slider value : %.2f", slider_.value);
     if (_player) {
         [_player seekToTime:slider_.value];
         _sliding = NO;
@@ -257,7 +259,7 @@
             break;
         case UPAVPlayerStatusFailed:{
             NSLog(@"播放失败－－－－－");
-
+            
         }
             break;
         default:
@@ -353,8 +355,8 @@
         
         //需要设置 rtc appId
         
-//        CGFloat w = [UIScreen mainScreen].bounds.size.width / 4;
-//        CGFloat h = [UIScreen mainScreen].bounds.size.height / 4;
+        //        CGFloat w = [UIScreen mainScreen].bounds.size.width / 4;
+        //        CGFloat h = [UIScreen mainScreen].bounds.size.height / 4;
         CGFloat w = 240 / 2.;
         CGFloat h = 320 / 2.;
         
@@ -374,7 +376,7 @@
         self.rtcRemoteView0 = [[UPAVCapturer sharedInstance] rtcRemoteView0WithFrame:frame_main];//显示主播画面
         self.rtcRemoteView1 = [[UPAVCapturer sharedInstance] rtcRemoteView1WithFrame:frame1];//显示另外一个连麦嘉宾画面
         self.videoPreview.frame = frame0;//显示自己画面
-
+        
         
         //将相关视频窗口，添加到_rtcContainerView。
         
@@ -454,7 +456,7 @@
     if (self.rtcRemoteView0.hidden && self.rtcRemoteView1.hidden) {
         self.rtcRemoteView0.hidden = NO;
     }
-
+    
 }
 
 
