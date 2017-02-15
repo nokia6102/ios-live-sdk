@@ -141,6 +141,29 @@ typedef void(^NetworkStateBlock)(UPAVStreamerNetworkState level);
 - (UIView *)rtcRemoteView1WithFrame:(CGRect)frame;//连麦窗口1
 
 
+/**
+ *  Mutes / Unmutes local audio.
+ *
+ *  @param mute true: Mutes the local audio. false: Unmutes the local audio.
+ *
+ *  @return 0 when executed successfully. return negative value if failed.
+ */
+- (int)rtcMuteLocalAudioStream:(BOOL)mute;
+
+
+/**
+ *  Mutes / Unmutes all remote audio.
+ *
+ *  @param mute true: Mutes all remote received audio. false: Unmutes all remote received audio.
+ *
+ *  @return 0 when executed successfully. return negative value if failed.
+ */
+
+- (int)rtcMuteAllRemoteAudioStreams:(BOOL)mute;
+
+- (int)rtcMuteRemoteAudioStream:(NSUInteger)uid
+                        mute:(BOOL)mute;
+
 
 /// 设置水印和动态处理的 block
 - (void)setWatermarkView:(UIView *)watermarkView Block:(WatermarkBlock)block;

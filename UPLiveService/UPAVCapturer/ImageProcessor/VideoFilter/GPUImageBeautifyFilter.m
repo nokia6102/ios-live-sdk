@@ -87,48 +87,48 @@ NSString *const kGPUImageBeautifyFragmentShaderString = SHADER_STRING
     _brightnessLevel = 1.1;
     
     // First pass: face smoothing filter
-    bilateralFilter = [[GPUImageBilateralFilter alloc] init];
-    bilateralFilter.distanceNormalizationFactor = 4.0;
-    [self addFilter:bilateralFilter];// 磨皮
+    _bilateralFilter = [[GPUImageBilateralFilter alloc] init];
+    _bilateralFilter.distanceNormalizationFactor = 4.0;
+    [self addFilter:_bilateralFilter];// 磨皮
     
     // Second pass: edge detection
     //cannyEdgeFilter = [[GPUImageCannyEdgeDetectionFilter alloc] init];
     //[self addFilter:cannyEdgeFilter];// 边缘检测
-    sobelEdgeFilter = [[GPUImageSobelEdgeDetectionFilter alloc]init];
-    [self addFilter:sobelEdgeFilter];
+    _sobelEdgeFilter = [[GPUImageSobelEdgeDetectionFilter alloc]init];
+    [self addFilter:_sobelEdgeFilter];
     
     
     // Third pass: combination bilateral, edge detection and origin
-    combinationFilter = [[GPUImageCombinationFilter alloc] init];
-    [self addFilter:combinationFilter];
+    _combinationFilter = [[GPUImageCombinationFilter alloc] init];
+    [self addFilter:_combinationFilter];
     
     // Adjust HSB
-    hsbFilter = [[GPUImageHSBFilter alloc] init];
-    [hsbFilter adjustBrightness:1.1]; // 亮度
-    [hsbFilter adjustSaturation:1.1]; // 饱和度
-    [bilateralFilter addTarget:combinationFilter];
-    //[cannyEdgeFilter addTarget:combinationFilter];
-    [sobelEdgeFilter addTarget:combinationFilter];
+    _hsbFilter = [[GPUImageHSBFilter alloc] init];
+    [_hsbFilter adjustBrightness:1.1]; // 亮度
+    [_hsbFilter adjustSaturation:1.1]; // 饱和度
+    [_bilateralFilter addTarget:_combinationFilter];
+    //[cannyEdgeFilter addTarget:_combinationFilter];
+    [_sobelEdgeFilter addTarget:_combinationFilter];
     
     
-    [combinationFilter addTarget:hsbFilter];
+    [_combinationFilter addTarget:_hsbFilter];
     
-    //self.initialFilters = [NSArray arrayWithObjects:bilateralFilter,cannyEdgeFilter,combinationFilter,nil];
-    self.initialFilters = [NSArray arrayWithObjects:bilateralFilter,sobelEdgeFilter,combinationFilter,nil];
+    //self.initialFilters = [NSArray arrayWithObjects:_bilateralFilter,cannyEdgeFilter,_combinationFilter,nil];
+    self.initialFilters = [NSArray arrayWithObjects:_bilateralFilter,_sobelEdgeFilter,_combinationFilter,nil];
 
-    self.terminalFilter = hsbFilter;
+    self.terminalFilter = _hsbFilter;
     
     return self;
 }
 
 - (void)setLevel:(CGFloat)level {
     _level = level;
-    [combinationFilter setIntensity:level];
+    [_combinationFilter setIntensity:level];
 }
 
 - (void)setBilateralLevel:(CGFloat)bilateralLevel {
     _bilateralLevel = bilateralLevel;
-    bilateralFilter.distanceNormalizationFactor = _bilateralLevel;
+    _bilateralFilter.distanceNormalizationFactor = _bilateralLevel;
 }
 
 - (void)setCannyEdgeLevel:(CGFloat)cannyEdgeLevel {
@@ -146,9 +146,9 @@ NSString *const kGPUImageBeautifyFragmentShaderString = SHADER_STRING
 }
 
 - (void)resetHsb {
-    [hsbFilter reset];
-    [hsbFilter adjustBrightness:_brightnessLevel]; // 亮度
-    [hsbFilter adjustSaturation:_saturationLevel]; // 饱和度
+    [_hsbFilter reset];
+    [_hsbFilter adjustBrightness:_brightnessLevel]; // 亮度
+    [_hsbFilter adjustSaturation:_saturationLevel]; // 饱和度
 }
 
 #pragma mark -
@@ -160,7 +160,7 @@ NSString *const kGPUImageBeautifyFragmentShaderString = SHADER_STRING
     {
         if (currentFilter != self.inputFilterToIgnoreForUpdates)
         {
-            if (currentFilter == combinationFilter) {
+            if (currentFilter == _combinationFilter) {
                 textureIndex = 2;
             }
             [currentFilter newFrameReadyAtTime:frameTime atIndex:textureIndex];
@@ -172,7 +172,7 @@ NSString *const kGPUImageBeautifyFragmentShaderString = SHADER_STRING
 {
     for (GPUImageOutput<GPUImageInput> *currentFilter in self.initialFilters)
     {
-        if (currentFilter == combinationFilter) {
+        if (currentFilter == _combinationFilter) {
             textureIndex = 2;
         }
         [currentFilter setInputFramebuffer:newInputFramebuffer atIndex:textureIndex];

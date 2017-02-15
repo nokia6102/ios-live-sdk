@@ -61,7 +61,7 @@
     settings.rtmpServerPushPath = @"rtmp://testlivesdk.v0.upaiyun.com/live/";
     settings.rtmpServerPlayPath = @"rtmp://testlivesdk.b0.upaiyun.com/live/";
     settings.fps = 24;
-    settings.filter = YES;
+    settings.beautifyOn = YES;
     settings.streamingOn = YES;
     settings.camaraTorchOn = NO;
     settings.camaraPosition = AVCaptureDevicePositionBack;

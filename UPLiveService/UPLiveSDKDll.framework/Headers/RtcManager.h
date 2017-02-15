@@ -90,4 +90,28 @@
 @property (assign) BOOL channelConnected;//连接状态
 @property (nonatomic, strong, readonly) NSMutableDictionary *onlineUids;//在线 user
 
+
+/**
+ *  Mutes / Unmutes local audio.
+ *
+ *  @param mute true: Mutes the local audio. false: Unmutes the local audio.
+ *
+ *  @return 0 when executed successfully. return negative value if failed.
+ */
+- (int)muteLocalAudioStream:(BOOL)mute;
+
+
+/**
+ *  Mutes / Unmutes all remote audio.
+ *
+ *  @param mute true: Mutes all remote received audio. false: Unmutes all remote received audio.
+ *
+ *  @return 0 when executed successfully. return negative value if failed.
+ */
+
+- (int)muteAllRemoteAudioStreams:(BOOL)mute;
+
+- (int)muteRemoteAudioStream:(NSUInteger)uid
+                        mute:(BOOL)mute;
+
 @end

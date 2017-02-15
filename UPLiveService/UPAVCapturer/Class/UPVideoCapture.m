@@ -49,6 +49,12 @@
 @property (nonatomic, strong) GPUImageView *gpuImageView;
 @property (nonatomic, strong) GPUImageUIElement *uielement;
 @property (nonatomic, strong) GPUImageAlphaBlendFilter *blendFilter;
+@property (nonatomic, strong) GPUImageFilter *blankFilter0;//空白滤镜
+@property (nonatomic, strong) GPUImageFilter *blankFilter1;//空白滤镜
+@property (nonatomic, strong) GPUImageFilter *blankFilter2;//空白滤镜
+
+
+
 
 /// 没有处理的滤镜进行中转, 防止加水印的获取不到图像数据
 @property (nonatomic, strong) GPUImageFilter *nFilter;
@@ -133,65 +139,56 @@
         | UIViewAutoresizingFlexibleLeftMargin
         | UIViewAutoresizingFlexibleHeight
         | UIViewAutoresizingFlexibleBottomMargin;
-        
         [_preview insertSubview:_gpuImageView atIndex:0];
-
     }
     
-    // 设置美颜滤镜
-    _beautifyFilter = [[GPUImageBeautifyFilter alloc] init];
-
+    //滤镜链
     //视频尺寸剪裁
     CGFloat cropW = _capturerPresetLevelFrameCropSize.width / _presetVideoFrameRect.width;
     CGFloat cropH = _capturerPresetLevelFrameCropSize.height / _presetVideoFrameRect.height;
-    _cropfilter = [[GPUImageCropFilter alloc] initWithCropRegion:CGRectMake(0.0, 0.0, cropW, cropH)];
-    
-    _scaleFilter = [[GPUImageTransformFilter alloc] init];
-    [_scaleFilter forceProcessingAtSizeRespectingAspectRatio:self.capturerPresetLevelFrameScaleSize];
-    
-    // 水印
-    if (_watermarkView) {
-        _uielement = [[GPUImageUIElement alloc] initWithView:_watermarkView];
-    }
-    _blendFilter = [[GPUImageAlphaBlendFilter alloc] init];
-    _blendFilter.mix = 1.0;
-    //滤镜链
-    
-    BOOL scalse = NO;
-    if (!scalse) {
-        [_videoCamera addTarget:_cropfilter];
-        [_cropfilter addTarget:_beautifyFilter];
-    } else {
-        [_videoCamera addTarget:_scaleFilter];
-        [_scaleFilter addTarget:_beautifyFilter];
-    }
-    
-    [_videoCamera addTarget:_cropfilter];
-    
-    if (_beautifyOn) {
-        [_cropfilter addTarget:_beautifyFilter];
-    }
-    _nFilter = [[GPUImageFilter alloc]init];
-
     
     GPUImageOutput<GPUImageInput> *lastFilter;
-    if (!_beautifyOn) {
-        lastFilter = _cropfilter;
-    } else {
-        lastFilter = _beautifyFilter;
-    }
 
+    _blankFilter2 = [[GPUImageFilter alloc] init];
+    [_videoCamera addTarget:_blankFilter2];
+
+    _cropfilter = [[GPUImageCropFilter alloc] initWithCropRegion:CGRectMake(0.0, 0.0, cropW, cropH)];
+
+    [_blankFilter2 addTarget:_cropfilter];
+    lastFilter = _cropfilter;
+    
     for (GPUImageOutput<GPUImageInput> *cusFilter in _filtersArray) {
         [lastFilter addTarget:cusFilter];
-        lastFilter = cusFilter;
+        _blankFilter1 = [[GPUImageFilter alloc] init];
+        [cusFilter addTarget:_blankFilter1];
+        lastFilter = _blankFilter1;
+    }
+
+    // 设置美颜滤镜
+    if (_beautifyOn) {
+        _beautifyFilter = [[GPUImageBeautifyFilter alloc] init];
+        [lastFilter addTarget:_beautifyFilter];
+        lastFilter = _beautifyFilter;
+    } else {
     }
     
-    if (_watermarkView) {
-        [lastFilter addTarget:_blendFilter];
-        [_uielement addTarget:_blendFilter];
+    // 水印
+    _nFilter = [[GPUImageFilter alloc] init];
+    
+    if (!_watermarkView) {
+        [lastFilter addTarget:_nFilter];
+        [_nFilter addTarget:_gpuImageView];
         
-        [lastFilter addTarget:_gpuImageView];
+    } else {
+        _uielement = [[GPUImageUIElement alloc] initWithView:_watermarkView];
+        _blendFilter = [[GPUImageAlphaBlendFilter alloc] init];
+        _blendFilter.mix = 1.0;
+        _blankFilter0 = [[GPUImageFilter alloc] init];
+        [lastFilter addTarget:_blankFilter0];
+        [_blankFilter0 addTarget:_blendFilter];
+        [_uielement addTarget:_blendFilter];
         [_blendFilter addTarget:_nFilter];
+        [lastFilter addTarget:_gpuImageView];
         
         __weak GPUImageUIElement *weakUielement = _uielement;
         [lastFilter setFrameProcessingCompletionBlock:^(GPUImageOutput *outPut, CMTime time) {
@@ -200,16 +197,11 @@
             }
             [weakUielement update];
         }];
-
-    } else {
-        [lastFilter addTarget:_nFilter];
-        [_nFilter addTarget:_gpuImageView];
     }
-    
-    
     [self outputPixelBuffer];
     //横屏旋转和前置拍摄镜面效果
     [self needFlip];
+
 }
 
 /// 去除滤镜链
@@ -220,6 +212,8 @@
     [_uielement removeAllTargets];
     [_nFilter removeAllTargets];
     [_blendFilter removeAllTargets];
+    [_blankFilter0 removeAllTargets];
+    
     for (GPUImageOutput<GPUImageInput> *cusFilter in _filtersArray) {
         [cusFilter removeAllTargets];
     }
@@ -574,6 +568,7 @@
     
     GPUImageOutput<GPUImageInput> *filter = nil;
     
+    
     switch (filterName) {
         case UPCustomFilter1977:{
             filter = [[FW1977Filter alloc] init];
@@ -655,7 +650,6 @@
             /// 这个滤镜和 美颜, 水印冲突
 //            filter = [[GPUImageSoftEleganceFilter alloc] init];
             filter = [[GPUImageFilter alloc] init];
-            
             break;
         }
     }

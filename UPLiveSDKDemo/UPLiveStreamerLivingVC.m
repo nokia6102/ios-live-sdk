@@ -102,7 +102,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    self.filterSwitch.on = _settings.filter;
+    self.filterSwitch.on = _settings.beautifyOn;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -114,10 +114,11 @@
     [[UPAVCapturer sharedInstance] stop];
     [UPAVCapturer sharedInstance].openDynamicBitrate = YES;
     [UPAVCapturer sharedInstance].capturerPresetLevel = _settings.level;
-    [UPAVCapturer sharedInstance].camaraPosition = _settings.camaraPosition;
+    [UPAVCapturer sharedInstance].camaraPosition = _settings.camaraPosition;  
     [UPAVCapturer sharedInstance].camaraTorchOn = _settings.camaraTorchOn;
     [UPAVCapturer sharedInstance].videoOrientation = _settings.videoOrientation;
     [UPAVCapturer sharedInstance].fps = _settings.fps;
+    [UPAVCapturer sharedInstance].beautifyOn = _settings.beautifyOn;
 
     //推流地址
     NSString *rtmpPushUrl = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
@@ -150,23 +151,22 @@
             break;
     }
     
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
+    label.text = @"我是水印";
+    label.textAlignment = NSTextAlignmentRight;
 
-//    CGSize size = [UIScreen mainScreen].bounds.size;
-//    __block UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, size.width, 44)];
-//    label.text = @"我是水印";
-//    label.textAlignment = NSTextAlignmentRight;
-//
-//    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
-//    imgV.image = [UIImage imageNamed:@"upyun_logo"];
-//
-//    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
-//    subView.backgroundColor = [UIColor clearColor];
-//    [subView addSubview:label];
-//    [subView addSubview:imgV];
-//    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
-//        //动态变化的时间戳
-//        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
-//    }];
+    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(size.width - 80, 44, 80, 60)];
+    imgV.image = [UIImage imageNamed:@"upyun_logo"];
+
+    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+    subView.backgroundColor = [UIColor clearColor];
+    [subView addSubview:label];
+    [subView addSubview:imgV];
+    [[UPAVCapturer sharedInstance] setWatermarkView:subView Block:^{
+        //动态变化的时间戳
+        label.text = [NSString stringWithFormat:@"upyun:%@", [NSDate date]];
+    }];
     
     
 //    [UPAVCapturer sharedInstance].networkSateBlock = ^(UPAVStreamerNetworkState level) {
@@ -227,6 +227,7 @@
 - (IBAction)filterSwitch:(id)sender {
     if (_filterCode > UPCustomFilterHefe) {
         [[UPAVCapturer sharedInstance] setFilter:nil];
+        _filterCode = -1;
     } else {
         [[UPAVCapturer sharedInstance] setFilterName:_filterCode];
     }
@@ -240,8 +241,7 @@
 }
 
 - (IBAction)beautifySwitch:(id)sender {
-    UISwitch *item = sender;
-    [UPAVCapturer sharedInstance].beautifyOn = item.on;
+    [UPAVCapturer sharedInstance].beautifyOn = ![UPAVCapturer sharedInstance].beautifyOn;
 }
 
 - (IBAction)cameraSwitch:(id)sender {

@@ -806,11 +806,25 @@
 
             [_audioUnitRecorder start];
             NSLog(@"_audioUnitRecorder start");
-
         }
     });
-    
 #endif
+}
+
+- (int)rtcMuteLocalAudioStream:(BOOL)mute {
+    if (!self.rtc.channelConnected) return -1;
+    return [self.rtc muteLocalAudioStream:mute];
+}
+
+- (int)rtcMuteAllRemoteAudioStreams:(BOOL)mute {
+    if (!self.rtc.channelConnected) return -1;
+    return [self.rtc muteAllRemoteAudioStreams:mute];
+}
+
+- (int)rtcMuteRemoteAudioStream:(NSUInteger)uid
+                           mute:(BOOL)mute {
+    if (!self.rtc.channelConnected) return -1;
+    return [self.rtc muteRemoteAudioStream:uid mute:mute];
 }
 
 

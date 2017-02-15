@@ -46,9 +46,7 @@
     UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc]
                                            initWithTarget:self
                                            action:@selector(hideKeyBoard)];
-    
     [self.view addGestureRecognizer:tapGesture];
-
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -77,7 +75,7 @@
         self.cameraSelectBtn.selectedSegmentIndex = 1;
     }
     
-    self.filterSwitch.on = _settings.filter;
+    self.filterSwitch.on = _settings.beautifyOn;
     self.streamingSwitch.on = _settings.streamingOn;
     self.flashSwitch.on = _settings.camaraTorchOn;
     
@@ -99,7 +97,7 @@
 
 
 - (IBAction)filterSwitch:(UISwitch *)sender {
-    _settings.filter = sender.on;
+    _settings.beautifyOn = sender.on;
 
 }
 - (IBAction)streamingSwitch:(UISwitch *)sender {

@@ -23,6 +23,7 @@
     BOOL _sliding;
     BOOL _rtcConnected;//是否已连麦
     UIView *_rtcContainerView;
+    BOOL _landscape;//横竖屏切换
 }
 
 
@@ -49,7 +50,7 @@
 - (void)viewDidLoad {
     [UPLiveSDKConfig setLogLevel:UP_Level_error];
     [UPLiveSDKConfig setStatistcsOn:YES];
-    
+
     self.view.backgroundColor = [UIColor blackColor];
     _activityIndicatorView = [[UIActivityIndicatorView alloc] init];
     _activityIndicatorView = [ [ UIActivityIndicatorView alloc ] initWithFrame:CGRectMake(250.0,20.0,30.0,30.0)];
@@ -83,7 +84,7 @@
     [_playProgressSlider addTarget:self action:@selector(progressSliderSeekTime:) forControlEvents:(UIControlEventTouchUpOutside)];
     [_playProgressSlider addTarget:self action:@selector(progressSliderTouchDown:) forControlEvents:(UIControlEventTouchDown)];
     [_playProgressSlider addTarget:self action:@selector(progressSliderValueChanged:) forControlEvents:(UIControlEventValueChanged)];
-    
+
     [self.view addSubview:_activityIndicatorView];
     [self.view addSubview:_playBtn];
     [self.view addSubview:_stopBtn];
@@ -99,10 +100,10 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    
+
     self.view.frame = [UIScreen mainScreen].bounds;
     [_player setFrame:[UIScreen mainScreen].bounds];
-    
+
     [self.view insertSubview:_player.playView atIndex:0];
     _activityIndicatorView.center = CGPointMake(_player.playView.center.x - 30, _player.playView.center.y);
     _bufferingProgressLabel.center = CGPointMake(_player.playView.center.x + 30, _player.playView.center.y);
@@ -129,6 +130,25 @@
     self.dashboardView.hidden =  !self.dashboardView.hidden;
 }
 
+- (IBAction)muteBtnTap:(UIButton *)sender {
+    _player.mute = !_player.mute;
+}
+
+- (IBAction)fullScreenBtnTap:(id)sender {
+    _landscape = !_landscape;
+//    UIViewController *vc = [[UIViewController alloc]init];
+//    [self presentViewController:vc animated:NO completion:^{
+//        [vc dismissViewControllerAnimated:NO completion:nil];
+//    }];
+    
+    
+    NSNumber *value = [NSNumber numberWithInt:UIInterfaceOrientationPortrait];
+    if (_landscape) {
+        value = [NSNumber numberWithInt:UIInterfaceOrientationLandscapeRight];
+    }
+    [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+}
+
 - (void)updateDashboard{
     
     NSMutableString *string = [NSMutableString new];
@@ -143,12 +163,12 @@
     [string appendString:[NSString stringWithFormat:@"aCachedFrames: %d \n", _player.dashboard.aCachedFrames]];
     [string appendString:[NSString stringWithFormat:@"vDecodedFrames: %d  key:%d\n", _player.dashboard.decodedVFrameNum,  _player.dashboard.decodedVKeyFrameNum]];
     [string appendString:[NSString stringWithFormat:@"aDecodedFrames: %d \n", _player.dashboard.decodedAFrameNum]];
-    
+
     
     for (NSString *key in _player.streamInfo.descriptionInfo.allKeys) {
         [string appendString:[NSString stringWithFormat:@"%@: %@ \n", key, _player.streamInfo.descriptionInfo[key]]];
     }
-    
+
     self.dashboardView.text = string;
     self.dashboardView.textColor = [UIColor whiteColor];
     
@@ -259,7 +279,7 @@
             break;
         case UPAVPlayerStatusFailed:{
             NSLog(@"播放失败－－－－－");
-            
+
         }
             break;
         default:
@@ -355,8 +375,8 @@
         
         //需要设置 rtc appId
         
-        //        CGFloat w = [UIScreen mainScreen].bounds.size.width / 4;
-        //        CGFloat h = [UIScreen mainScreen].bounds.size.height / 4;
+//        CGFloat w = [UIScreen mainScreen].bounds.size.width / 4;
+//        CGFloat h = [UIScreen mainScreen].bounds.size.height / 4;
         CGFloat w = 240 / 2.;
         CGFloat h = 320 / 2.;
         
@@ -376,7 +396,7 @@
         self.rtcRemoteView0 = [[UPAVCapturer sharedInstance] rtcRemoteView0WithFrame:frame_main];//显示主播画面
         self.rtcRemoteView1 = [[UPAVCapturer sharedInstance] rtcRemoteView1WithFrame:frame1];//显示另外一个连麦嘉宾画面
         self.videoPreview.frame = frame0;//显示自己画面
-        
+
         
         //将相关视频窗口，添加到_rtcContainerView。
         
@@ -456,7 +476,23 @@
     if (self.rtcRemoteView0.hidden && self.rtcRemoteView1.hidden) {
         self.rtcRemoteView0.hidden = NO;
     }
-    
+}
+
+
+//横竖屏切换
+- (BOOL)shouldAutorotate {
+    return YES;// return NO 可以
+}
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskLandscapeRight | UIInterfaceOrientationMaskPortrait;
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+    if (_landscape) {
+        return UIInterfaceOrientationLandscapeRight;
+    } else {
+        return UIInterfaceOrientationPortrait;
+    }
 }
 
 

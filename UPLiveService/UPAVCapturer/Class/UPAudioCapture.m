@@ -285,8 +285,12 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
     [session setCategory:AVAudioSessionCategoryPlayAndRecord
              withOptions:AVAudioSessionCategoryOptionMixWithOthers | AVAudioSessionCategoryOptionDefaultToSpeaker
                    error:&error];
-    
-    
+    BOOL success =  [session setMode :AVAudioSessionModeDefault error:&error];
+    if (success) {
+//        NSLog(@"session setMode  success %@", error);
+    } else {
+        NSLog(@"session setMode error %@", error);
+    }
 }
 
 - (void)setup {

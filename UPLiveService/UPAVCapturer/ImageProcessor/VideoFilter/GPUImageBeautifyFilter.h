@@ -22,11 +22,11 @@
 @interface GPUImageBeautifyFilter : GPUImageFilterGroup {
     // 修改参考 http://www.jianshu.com/p/dde412cab8db
 
-    GPUImageBilateralFilter *bilateralFilter;
-    GPUImageSobelEdgeDetectionFilter *sobelEdgeFilter;
-    GPUImageCombinationFilter *combinationFilter;
-    GPUImageHSBFilter *hsbFilter;
 }
+
+
+
+
 
 /// 美颜效果。值越大效果越强。可适当调整
 @property (nonatomic, assign)CGFloat level;//默认值 0.6
@@ -39,4 +39,13 @@
 
 /// 亮度。值越小画面越暗，值越大越明亮。可适当调整。
 @property (nonatomic, assign)CGFloat brightnessLevel;//默认值 1.1
+
+
+@property (nonatomic, strong) GPUImageHSBFilter *hsbFilter;
+@property (nonatomic, strong) GPUImageBilateralFilter *bilateralFilter;
+@property (nonatomic, strong) GPUImageSobelEdgeDetectionFilter *sobelEdgeFilter;
+@property (nonatomic, strong) GPUImageCombinationFilter *combinationFilter;
+
+
+
 @end
