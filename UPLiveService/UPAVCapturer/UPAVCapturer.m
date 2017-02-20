@@ -780,6 +780,7 @@
 
 - (int)rtcConnect:(NSString *)channelId{
 #ifdef _UPRTCSDK_
+    [_audioUnitRecorder stop];
     if (![self trySetRtcInputVideoSize]) {
         NSLog(@"连麦错误：请检查 appID 及 采集视频尺寸");
         return -2;
