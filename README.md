@@ -1,6 +1,4 @@
-# 又拍云 iOS 直播 SDK(动态库) 使用说明   
-
-
+# 又拍云 iOS 直播 SDK(动态库) 使用说明         
 __注: 从4.0.0版本之后 SDK 改为了动态库形式.__
 
 
@@ -46,7 +44,11 @@ UPLiveService 文件夹
 ```TARGET -> Build Settings -> Enable bitcode```： 设置为 NO  			
 
 
-```TARGET -> General -> Embedded Binaries```： 添加选择 UPLiveSDKDll.framework			
+```TARGET -> General -> Embedded Binaries```： 添加选择 UPLiveSDKDll.framework
+
+
+
+__［注意］__ 如果需要 app 退出后台仍然不间断推流直播，需要设置 ```TARGET -> Capabilities -> Backgroud Modes:ON    √ Audio, AirPlay,and Picture in Picture``` 			
 
 
 
