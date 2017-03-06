@@ -1,28 +1,28 @@
 # 又拍云 iOS 直播 SDK(动态库) 使用说明         
-__注: 从4.0.0版本之后 SDK 改为了动态库形式.__
+***注: 从4.0.0 版本之后 SDK 改为了动态库形式.***
 
 
-## SDK 概述     
+## 1 SDK 概述     
 
-此 `SDK` 包含推流和拉流两部分，及美颜滤镜，连麦等全套直播功能；
-       
-
-此 `SDK` 中的播放器、采集器、推流器可单独使用。用户可以自主构建直播中某个环节，比如播放器（`UPAVPlayer`）可以与 Web 推流器 Flex 相配合。推流器（`UPAVStreamer`）可以配合系统自带的AVCapture 或者`GPUImage `库提供的采集功能。 
+此 `SDK` 包含推流和拉流两部分，支持美颜滤镜、水印、连麦等全套直播功能。                
+此 `SDK` 中的播放器、采集器、推流器均可单独使用。        
 
 
 基于此 `SDK` 结合 __upyun__ 直播平台可以快速构建直播应用。
 
 [UPYUN 直播平台自主配置流程](http://docs.upyun.com/live/) 
+
   
-## SDK使用说明
+## 2 SDK使用说明
 
-### 运行环境和兼容性
+### 2.1 运行环境和兼容性
 
-```UPLiveSDKDll.framework``` 支持 `iOS 8` 及以上系统版本； 
-	
-支持 `ARMv7`，`ARM64` 架构。请使用真机进行开发和测试。
+```UPLiveSDKDll.framework``` 支持 `iOS 8` 及以上系统版本；     
+支持 `ARMv7`，`ARM64` 架构。请使用真机进行开发和测试。     
 
-### 安装使用说明
+```UPLiveSDKDll.framework``` 接口支持 Swift 3 调用，参考 [DemoSwift3](http://test86400.b0.upaiyun.com/iossdk/UPLiveSDkDemoSwift3.zip) 。 
+
+### 2.2 安装使用说明
 
 	
 #### 手动安装方法：
@@ -39,7 +39,7 @@ UPLiveService 文件夹
 
 ```
 
-#### 工程设置：     
+#### 2.3 工程设置：     
 
 ```TARGET -> Build Settings -> Enable bitcode```： 设置为 NO  			
 
@@ -48,11 +48,11 @@ UPLiveService 文件夹
 
 
 
-__［注意］__ 如果需要 app 退出后台仍然不间断推流直播，需要设置 ```TARGET -> Capabilities -> Backgroud Modes:ON    √ Audio, AirPlay,and Picture in Picture``` 			
+***注: 如果需要 app 退出后台仍然不间断推流直播，需要设置 ```TARGET -> Capabilities -> Backgroud Modes:ON    √ Audio, AirPlay,and Picture in Picture```***	
 
 
 
-#### 工程依赖：
+#### 2.4 工程依赖：
 
 `AVFoundation.framework`
 
@@ -84,10 +84,12 @@ __［注意］__ 如果需要 app 退出后台仍然不间断推流直播，需�
 
 
 
-***注意: 此 `SDK` 已经包含 `FFMPEG 3.0` , 不建议自行再添加 `FFMPEG` 库 , 如有特殊需求, 请联系我们***    
+***注: 此 `SDK` 已经包含 `FFMPEG 3.0` , 不建议自行再添加 `FFMPEG` 库 , 如有特殊需求, 请联系我们***       
 
 
-## 推流端功能特性 （采集器 ＋ 推流器）
+## 3 功能特性
+
+### 3.1 推流端功能特性 （采集器 ＋ 推流器）
 
 
 * 音频编码：`AAC` 
@@ -116,7 +118,7 @@ __［注意］__ 如果需要 app 退出后台仍然不间断推流直播，需�
 
 
 
-## 播放端功能特性 （播放器）
+### 3.2 播放端功能特性 （播放器）
 
 * 支持播放直播源和点播源，支持播放本地视频文件。
 
@@ -137,10 +139,13 @@ __［注意］__ 如果需要 app 退出后台仍然不间断推流直播，需�
 * 支持自动音画同步调整
 
 
-## SDK下载
+## 4 SDK下载
 Demo 下载: `https://github.com/upyun/ios-live-sdk`
 
-## 推流 SDK 使用示例 UPAVCapturer
+
+## 5 使用示例 
+
+### 5.1 推流使用示例 UPAVCapturer
 
 使用__拍摄和推流__功能需要引入头文件  `#import "UPAVCapturer.h"`  
 
@@ -182,7 +187,7 @@ __注:__ ``UPLiveSDKDll.framework``中的推流器 `UPAVStreamer`也可以单独
 ```
 
 
-## 拉流 SDK 使用示例 UPAVPlayer
+### 5.2 拉流使用示例 UPAVPlayer
 
 使用 ```UPAVPlayer``` 需要引入头文件 ```#import <UPLiveSDKDll/UPAVPlayer.h>```
 
@@ -220,69 +225,11 @@ __注:__ ``UPLiveSDKDll.framework``中的推流器 `UPAVStreamer`也可以单独
 
 
 
-## Q&A
-
-__1.推流、拉流是什么意思？__
-
-推流是指采集端将音视频流推送到直播服务器的过程；	
-拉流是指从直播服务器获取音视频数据的过程。
-
-__2.UPLiveSDKDll.framework 中的 UPAVCapturer、UPAVStreamer、UPAVPlayer 作用及之间的关系？__
-
-UPAVPlayer 是播放器，可以播放点播或直播流；		
-UPAVStreamer 是推流器，可以将音视频流推到直播服务器上;            
-UPAVCapturer 是采集器负责采集录制音视频数据。	
-除了 UPAVCapturer 会用到 UPAVStreamer 进行推流外，这三者可以独立使用。     	
-
-__3.可否同时播放两条流？__ 
-
-支持在同一个界面上放置多个 UPAVPlayer 播放器同时播放多个流。同时也可选择任一一条流静音播放。
-
-__4.如何实现秒开，如何优化秒开？__
-
-使用 UPAVPlayer 与又拍云的视频服务基本可以实现开播小于 0.5 秒；         
-利用 UPAVPlayer 进行先连接后播放操作，结合适当的 UI 效果也可以改善视频秒开体验。        
-
-__5.如何进行低延时优化？__
-
-又拍云的视频服务基本可以做到直播的全过程延时小于 3 秒。           
-同时可以调整 UPAVPlayer 播放器的缓冲大小，来减小播放器本地带来的延时。         
-
-__6.耗电量多少？可否长时间直播？__
-
-耗电量多少与不同机型及网络环境相关。对于 iphone 5s 及以上机型可以长时间推流，也不会感觉到手机发烫。
-直播一小时一般电量消耗在 10％ － 20％ 范围之间。
-
-__7.横屏拍摄和屏幕旋转问题怎么解决？__     
-
-对于“横屏拍摄和屏幕旋转”问题的一个关键点：需要区分清楚 UI(设备)的横竖屏与镜头横竖拍摄的区别。并且拍摄开始之后“镜头横竖” 是已经固定了无法更改。具体可参考 demo 的解决方式。    
-
-__8.直播的视频尺寸是否可以自定义？__   
-
-最终的推流视频尺寸取决于两点：        	
-	
-1) 镜头采集到的图像尺寸。不同设备支持多种不同的拍摄尺寸，一般的 480x360、640x480、1280x720是各种设备及前后镜头支持最广泛的。这个参数可以通过 UPAVCapturer 的 capturerPresetLevel 属性进行修改。            
-
-2) 剪裁图像尺寸。在采集尺寸的基础上可以通过 UPAVCapturer 的 capturerPresetLevelFrameCropRect 属性进行图像剪裁。
-例如：选择 640x480 像素的镜头进行拍摄后可以再剪裁为 640x360 全屏比例图片进行直播。 
-
-
-__9.可不可以仅直播声音不传图像？__     
-
-可以。UPAVCapturer 支持单音频推流，UPAVPlayer支持单音频流的播放。 
-
-__10.如何快速体验和测试直播？__
-
-下载 demo 工程运行后，便可以直接进行直播测试。  
-
-      
-
-__[注]__ 如果需要自主注册直播云服务可以参考：[UPYUN 直播平台自主配置流程](http://docs.upyun.com/live/)       
 __[注]__  如果需要在产品中正式使用连麦功能，请联系申请 ``` rtc appid ```, 可以参考 ``` README_rtc.md ``` 熟悉连麦直播流程。
 
 
 
-## 版本历史 
+## 6 版本历史 
 
 __4.0.0  改为动态库，连麦功能完善。 建议更新 2017.02.06__  
 
@@ -341,7 +288,7 @@ __1.0.2 性能优化，添加美颜滤镜__
  	
 __1.0.1 基本的直播推流器和播放器；__  
  
-## 反馈与建议
+## 7 反馈与建议
 
  邮箱：<livesdk@upai.com>
  
