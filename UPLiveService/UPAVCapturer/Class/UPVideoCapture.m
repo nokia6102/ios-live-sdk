@@ -454,7 +454,7 @@
     //记录preview的UI方向，如果UI方向和拍摄方向不一致时候，拍摄画面需要旋转
     _previewOrientation = [[UIApplication sharedApplication] statusBarOrientation];
 #endif
-//    [self preViewAddTapGesture];
+    [self preViewAddTapGesture];
     return _preview;
 }
 

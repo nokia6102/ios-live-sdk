@@ -12,6 +12,9 @@
 #import "GPUImage.h"
 #import "GPUImageFramebuffer.h"
 #import "LFGPUImageBeautyFilter.h"
+#import <UPLiveSDKDll/UPLiveSDKLogger.h>
+#import <UPLiveSDKDll/UPLiveSDKConfig.h>
+
 
 //连麦模块可先择集成
 #ifdef _UPRTCSDK_
@@ -240,20 +243,25 @@
             case UPPushAVStreamStatusClosed:{
                 if (!self.delegate ) {
                     //代理可能提前销毁了，在这里提示一下推流结束.
-                    NSLog(@"[Logger] UPAVStreamerStatusClosed");
+                    [UPLiveSDKLogger log:@"UPAVCapturer.UPAVStreamerStatusClosed" level:UP_Level_debug tag:UP_Tag_event];
                 }
             }
                 break;
             case UPPushAVStreamStatusConnecting:
+                [UPLiveSDKLogger log:@"UPAVCapturer.UPPushAVStreamStatusConnecting" level:UP_Level_debug tag:UP_Tag_event];
                 break;
             case UPPushAVStreamStatusReady:
+                [UPLiveSDKLogger log:@"UPAVCapturer.UPPushAVStreamStatusReady" level:UP_Level_debug tag:UP_Tag_event];
                 break;
             case UPPushAVStreamStatusPushing:
+                [UPLiveSDKLogger log:@"UPAVCapturer.UPPushAVStreamStatusPushing" level:UP_Level_debug tag:UP_Tag_event];
                 break;
             case UPPushAVStreamStatusError: {
+                [UPLiveSDKLogger log:@"UPAVCapturer.UPPushAVStreamStatusError" level:UP_Level_debug tag:UP_Tag_event];
+
                 if ([self autoReconnectionShouldConnect]) {
                     [self autoReconnectionLogsAdd];
-                    NSLog(@"尝试重新连接...");
+                    [UPLiveSDKLogger log:@"UPAVCapturer.尝试重新连接..." level:UP_Level_debug tag:UP_Tag_event];
                     [_rtmpStreamer reconnect];
                 } else {
                     self.capturerStatus = UPAVCapturerStatusError;
@@ -405,6 +413,8 @@
 }
 
 - (void)start {
+    
+    [UPLiveSDKLogger log:@"UPAVCapturer.start" level:UP_Level_debug tag:UP_Tag_event];
     [self addNotifications];
     //实例化推流器 _rtmpStreamer
     dispatch_async(_pushFrameQueue, ^{
@@ -454,6 +464,8 @@
 }
 
 - (void)stop {
+    [UPLiveSDKLogger log:@"UPAVCapturer.stop" level:UP_Level_debug tag:UP_Tag_event];
+
     [self removeNotifications];
     //关闭背景音播放器
     if([UPAVCapturer sharedInstance].backgroudMusicOn) {
@@ -497,8 +509,9 @@
 
 - (void)dealloc {
     [self removeNotifications];
-    NSString *message = [NSString stringWithFormat:@"dealloc %@", self];
-    NSLog(@"%@",message);
+    NSString *message = [NSString stringWithFormat:@"UPAVCapturer dealloc %@", self];
+    [UPLiveSDKLogger log:message level:UP_Level_debug tag:UP_Tag_event];
+
 }
 
 
@@ -636,11 +649,13 @@
 #pragma mark applicationActiveSwitch
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
+    [UPLiveSDKLogger log:@"UPAVCapturer._applicationActive NO" level:UP_Level_debug tag:UP_Tag_event];
     _applicationActive = NO;
     [_upVideoCapture.videoCamera pauseCameraCapture];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
+    [UPLiveSDKLogger log:@"UPAVCapturer._applicationActive YES" level:UP_Level_debug tag:UP_Tag_event];
     _applicationActive = YES;
     //电话打断（接通），推流失败问题
     [_audioUnitRecorder start];
@@ -673,6 +688,8 @@
         if (_streamingOn) {
             [_rtmpStreamer pushPixelBuffer:_backGroundPixBuffer];
         }
+        
+        [UPLiveSDKLogger log:@"UPAVCapturer.backGroundFrameSendLoopStart" level:UP_Level_error tag:UP_Tag_event];
         [weakself backGroundFrameSendLoopStart:loopid];
     });
 }
@@ -716,7 +733,9 @@
             [_rtmpStreamer pushPixelBuffer:pixelBuffer];
         } else {
             //_streaming off 提示。
-            NSLog(@"_streaming off %d", _streamingOn);
+            NSString *message = [NSString stringWithFormat:@"UPAVCapturer._streaming off %d", _streamingOn];
+            [UPLiveSDKLogger log:message level:UP_Level_debug tag:UP_Tag_event];
+
         }
         if (pixelBuffer) {
             CFRelease(pixelBuffer);
@@ -754,7 +773,8 @@
     self.rtc = [RtcManager sharedInstance];
     self.rtc.delegate = self;
     [self.rtc setAppId:appid];
-    NSLog(@"连麦模块 InitWithAppId");
+    [UPLiveSDKLogger log:@"UPAVCapturer.连麦模块 InitWithAppId" level:UP_Level_debug tag:UP_Tag_event];
+
 #endif
 }
 
@@ -782,20 +802,22 @@
 #ifdef _UPRTCSDK_
     [_audioUnitRecorder stop];
     if (![self trySetRtcInputVideoSize]) {
-        NSLog(@"连麦错误：请检查 appID 及 采集视频尺寸");
+        [UPLiveSDKLogger log:@"UPAVCapturer.连麦错误：请检查 appID 及 采集视频尺寸" level:UP_Level_error tag:UP_Tag_event];
         return -2;
     }
     
     [self.rtc startWithRtcChannel:channelId];
     return 0;
 #else
-    NSLog(@"连麦需要安装连麦模块：UPRtcSDK.framework");
+    [UPLiveSDKLogger log:@"UPAVCapturer.连麦需要安装连麦模块" level:UP_Level_error tag:UP_Tag_event];
     return -1;
 #endif
 }
 
 - (void)rtcClose {
 #ifdef _UPRTCSDK_
+    
+    [UPLiveSDKLogger log:@"UPAVCapturer.rtcClose" level:UP_Level_debug tag:UP_Tag_event];
     [self.rtc stop];
     //rtc _audioUnitRecorder
     double delayInSeconds = 1;
@@ -803,10 +825,10 @@
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         if (self.capturerStatus == UPAVCapturerStatusLiving) {
             [_audioUnitRecorder stop];
-            NSLog(@"_audioUnitRecorder stop");
-
+            
+            [UPLiveSDKLogger log:@"UPAVCapturer._audioUnitRecorder stop" level:UP_Level_debug tag:UP_Tag_event];
             [_audioUnitRecorder start];
-            NSLog(@"_audioUnitRecorder start");
+            [UPLiveSDKLogger log:@"UPAVCapturer._audioUnitRecorder start" level:UP_Level_debug tag:UP_Tag_event];
         }
     });
 #endif
@@ -866,7 +888,12 @@
             [self.delegate capturer:self rtcDidJoinedOfUid:uid];
         }
     });
-    NSLog(@"======  rtc didJoinedOfUid: %lu   onlineUids: %@", (unsigned long)uid, manager.onlineUids);
+    
+
+    NSString *message = [NSString stringWithFormat:@"UPAVCapturer.rtc didJoinedOfUid: %lu   onlineUids:  %@",  (unsigned long)uid, manager.onlineUids];
+    
+    [UPLiveSDKLogger log:message level:UP_Level_debug tag:UP_Tag_event];
+
 }
 -(void)rtc:(RtcManager *)manager didOfflineOfUid:(NSUInteger)uid reason:(NSUInteger)reason {
     
@@ -875,7 +902,9 @@
             [self.delegate capturer:self rtcDidOfflineOfUid:uid reason:reason];
         }
     });
-    NSLog(@"======  rtc didOfflineOfUid: %lu   onlineUids: %@", (unsigned long)uid, manager.onlineUids);
+    
+    NSString *message = [NSString stringWithFormat:@"UPAVCapturer.rtc didOfflineOfUid: %lu   onlineUids: %@", (unsigned long)uid, manager.onlineUids];
+    [UPLiveSDKLogger log:message level:UP_Level_debug tag:UP_Tag_event];
 }
 
 /*** rtc 错误及警告***/
@@ -893,11 +922,15 @@
             [self.delegate capturer:self rtcDidOccurError:errorCode];
         }
     });
-    NSLog(@"======  rtc didOccurError: %lu", (unsigned long)errorCode);
+    
+    NSString *message = [NSString stringWithFormat:@"UPAVCapturer.rtc didOccurError: %lu", (unsigned long)errorCode];
+    [UPLiveSDKLogger log:message level:UP_Level_debug tag:UP_Tag_event];
 }
 
 - (void)rtcConnectionDidLost:(RtcManager *)manager {
     //连麦异常断开
+    [UPLiveSDKLogger log:@"UPAVCapturer.rtcConnectionDidLost" level:UP_Level_error tag:UP_Tag_event];
+
     [self rtcClose];
     
     dispatch_async(dispatch_get_main_queue(), ^(){
@@ -930,28 +963,30 @@
     [_autoReconnectionLogs.lastObject setObject:@"1" forKey:@"flag"];
 }
 
+
+//重连限制策略定义
 - (BOOL)autoReconnectionShouldConnect {
     NSInteger logsCount = _autoReconnectionLogs.count;
 
-    //一次直播最多重连次数限制 20 次
-    int reconnectionMaxCountLimit = 20;
+    //一次直播最多重连次数限制 10 次
+    int reconnectionMaxCountLimit = 10;
     if (logsCount > reconnectionMaxCountLimit) {
         
-        NSLog(@"autoReconnection: 最多重连次数限制 30 次, 停止自动重连");
+        [UPLiveSDKLogger log:@"UPAVCapturer.autoReconnection: 最多重连次数限制 10 次, 停止自动重连" level:UP_Level_error tag:UP_Tag_event];
         return NO;
     }
 
-    // 30秒内重连次数限制 10 次
-    int reconnectionFrequencyLimit  = 10;
+    // 15秒内重连次数限制 3 次
+    int reconnectionFrequencyLimit  = 3;
     int tempCount = 0;
     for (NSDictionary *log in _autoReconnectionLogs) {
         NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:[log objectForKey:@"date"]];
-        if (interval < 30) {
+        if (interval < 15) {
             tempCount ++;
         }
     }
     if (tempCount > reconnectionFrequencyLimit) {
-        NSLog(@"autoReconnection: 30秒内重连次数限制 10 次, 停止自动重连");
+        [UPLiveSDKLogger log:@"UPAVCapturer.autoReconnection: 15秒内重连次数限制 3 次, 停止自动重连" level:UP_Level_error tag:UP_Tag_event];
         return NO;
     }
     
@@ -969,7 +1004,8 @@
             }
         }
         //最近几次重连是连续的失败，返回 NO
-        NSLog(@"autoReconnection: 连续重连失败次数限制 3 次, 停止自动重连");
+        [UPLiveSDKLogger log:@"UPAVCapturer.autoReconnection: 连续重连失败次数限制 2 次, 停止自动重连" level:UP_Level_error tag:UP_Tag_event];
+
         return NO;
         
     }
@@ -988,7 +1024,6 @@
 }
 
 - (void)afterTimes {
-//    NSLog(@"重置 重连次数 %d", _reconnectCount);
     _reconnectCount = 0;
 }
 
