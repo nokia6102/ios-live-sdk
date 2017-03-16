@@ -285,12 +285,23 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
     [session setCategory:AVAudioSessionCategoryPlayAndRecord
              withOptions:AVAudioSessionCategoryOptionMixWithOthers | AVAudioSessionCategoryOptionDefaultToSpeaker
                    error:&error];
-    BOOL success =  [session setMode :AVAudioSessionModeDefault error:&error];
+    BOOL success =  [session setMode: AVAudioSessionModeDefault error:&error];
     if (success) {
-//        NSLog(@"session setMode  success %@", error);
+
     } else {
         NSLog(@"session setMode error %@", error);
     }
+    
+    double sampleRate = 32000.0;
+    NSError *audioSessionError = nil;
+    
+    success = [session setPreferredSampleRate:sampleRate error:&audioSessionError];
+    
+    if (success) {
+    } else {
+        NSLog(@"session setPreferredSampleRate audioSessionError %@", audioSessionError);
+    }
+    
 }
 
 - (void)setup {
@@ -395,17 +406,29 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
 
 - (void)start{
     [self setupAudioSession];
+    [self setup];
     [_audioGraph start];
     OSStatus status = AudioOutputUnitStart(_audioUnit);
     checkOSStatus(status);
     _audioCapturIsWorking = YES;
+    
+
 }
 - (void)stop {
     [_bgmPlayer stop];
     [_audioGraph stop];
-    OSStatus status = AudioOutputUnitStop(_audioUnit);
-    checkOSStatus(status);
+    [self stopAudioUnit];
     _audioCapturIsWorking = NO;
+}
+
+- (void)stopAudioUnit {
+    if (_audioUnit) {
+        OSStatus status = AudioOutputUnitStop(_audioUnit);
+        checkOSStatus(status);
+        AudioUnitUninitialize(_audioUnit);
+        AudioComponentInstanceDispose(_audioUnit);
+        _audioUnit = nil;
+    }
 }
 
 - (void)processAudio:(AudioBufferList *)bufferList
@@ -583,8 +606,11 @@ willRenderBuffer:(AudioBufferList *)audioBufferList
 }
 
 - (void)dealloc {
-    AudioUnitUninitialize(_audioUnit);
-    free(_tempBuffer.mData);
+    [self stopAudioUnit];
+    if (_tempBuffer.mData) {
+        free(_tempBuffer.mData);
+    }
+
 }
 
 @end

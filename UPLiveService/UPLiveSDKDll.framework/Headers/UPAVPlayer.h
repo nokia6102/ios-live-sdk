@@ -101,12 +101,16 @@ willRenderBuffer:(AudioBufferList *)audioBufferList
 @property (nonatomic, assign) CGFloat volume;
 @property (nonatomic, assign) CGFloat bright;
 @property (nonatomic, assign) BOOL mute;
-@property (nonatomic, assign) NSTimeInterval bufferingTimeOutLimit;
+
+@property (nonatomic, assign) NSTimeInterval timeoutForOpenFile;//打开文件超时 默认 10s
+@property (nonatomic, assign) NSUInteger maxNumForReopenFile;//打开文件重试次数限制 默认 1次 最大 10次
+
 @property (nonatomic, copy) NSString *url;
 @property (nonatomic, assign, readonly) float displayPosition;//视频播放到的时间点
 @property (nonatomic, assign, readonly) float streamPosition;//视频流读取到的时间点
 @property (nonatomic, weak) id<UPAVPlayerDelegate> delegate;
 @property (nonatomic) BOOL lipSynchOn;//音画同步，默认值 YES
+
 
 
 - (instancetype)initWithURL:(NSString *)url;
