@@ -100,6 +100,8 @@
  */
 - (int)muteLocalAudioStream:(BOOL)mute;
 
+- (int)muteLocalVideoStream:(BOOL)mute;
+
 
 /**
  *  Mutes / Unmutes all remote audio.
