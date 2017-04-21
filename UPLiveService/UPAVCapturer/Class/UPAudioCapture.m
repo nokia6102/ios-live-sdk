@@ -405,6 +405,9 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
 }
 
 - (void)start{
+    if (_audioCapturIsWorking) {
+        return;
+    }
     [self setupAudioSession];
     [self setup];
     [_audioGraph start];
