@@ -465,7 +465,7 @@
 
 - (void)stop {
     [UPLiveSDKLogger log:@"UPAVCapturer.stop" level:UP_Level_debug tag:UP_Tag_event];
-
+    [self stopFrameSendLoop];
     [self removeNotifications];
     //关闭背景音播放器
     if([UPAVCapturer sharedInstance].backgroudMusicOn) {
