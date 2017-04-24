@@ -13,13 +13,6 @@
 
 
 
-
-#ifndef _UPRTCSDK_
-    #define _UPRTCSDK_
-#endif
-
-
-
 @class RtcManager;
 
 @protocol RtcManagerDataOutProtocol <NSObject>
