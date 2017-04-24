@@ -408,6 +408,7 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
     if (_audioCapturIsWorking) {
         return;
     }
+    
     [self setupAudioSession];
     [self setup];
     [_audioGraph start];
@@ -415,7 +416,6 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
     checkOSStatus(status);
     _audioCapturIsWorking = YES;
     
-
 }
 - (void)stop {
     [_bgmPlayer stop];

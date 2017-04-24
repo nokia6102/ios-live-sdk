@@ -17,12 +17,11 @@
 
 
 //连麦模块可先择集成
-#ifdef _UPRTCSDK_
+
 
 @interface UPAVCapturer()<RtcManagerDataOutProtocol>
 @property (nonatomic, strong) RtcManager *rtc;
 @end
-#endif
 
 
 @import  Accelerate;
@@ -30,8 +29,7 @@
 
 @interface UPAVCapturer()<UPAVStreamerDelegate, UPAudioCaptureProtocol, UPVideoCaptureProtocol> {
     NSError *_capturerError;
-    //backgroud push
-    BOOL _applicationActive;
+
     CVPixelBufferRef _backGroundPixBuffer;
     int _backGroundFrameSendloopid;
     BOOL _backGroundFrameSendloopOn;
@@ -142,7 +140,6 @@
         _capturerPresetLevelFrameCropSize = CGSizeZero;
         _fps = 24;
         _viewZoomScale = 1;
-        _applicationActive = YES;
         _streamingOn = YES;
         _beautifyOn = NO;
         _increaserRate = 100;//原声
@@ -479,11 +476,9 @@
     [_audioUnitRecorder stop];
     
     //关闭连麦模块
-#ifdef _UPRTCSDK_
     if (self.rtc.channelConnected) {
         [self.rtc stop];
     }
-#endif
     
     self.capturerStatus = UPAVCapturerStatusStopped;
     
@@ -504,7 +499,8 @@
     if (_delayTimer) {
         [_delayTimer invalidate];
         _delayTimer = nil;
-    }    
+    }
+    
 }
 
 - (void)dealloc {
@@ -639,24 +635,25 @@
 
 - (void)didReceiveBuffer:(AudioBuffer)audioBuffer info:(AudioStreamBasicDescription)asbd {
     [self didCaptureAudioBuffer:audioBuffer withInfo:asbd];
-    if(!_applicationActive) {
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
         [self startFrameSendLoopWith:_backGroundFrameSendloopid];
     } else {
-        [self stopFrameSendLoop];
+        if (_backGroundFrameSendloopOn) {
+            [self stopFrameSendLoop];
+        }
     }
 }
 
 #pragma mark applicationActiveSwitch
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
-    [UPLiveSDKLogger log:@"UPAVCapturer._applicationActive NO" level:UP_Level_debug tag:UP_Tag_event];
-    _applicationActive = NO;
+    [UPLiveSDKLogger log:@"UPAVCapturer.ApplicationActive NO" level:UP_Level_debug tag:UP_Tag_event];
     [_upVideoCapture.videoCamera pauseCameraCapture];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-    [UPLiveSDKLogger log:@"UPAVCapturer._applicationActive YES" level:UP_Level_debug tag:UP_Tag_event];
-    _applicationActive = YES;
+    [UPLiveSDKLogger log:@"UPAVCapturer.ApplicationActive YES" level:UP_Level_debug tag:UP_Tag_event];
+
     //电话打断（接通），推流失败问题
     [_audioUnitRecorder start];
     [_upVideoCapture.videoCamera resumeCameraCapture];
@@ -667,6 +664,7 @@
 - (void)stopFrameSendLoop {
     _backGroundFrameSendloopOn = NO;
     _backGroundFrameSendloopid = _backGroundFrameSendloopid + 1;
+    NSLog(@"stop---------%d", _backGroundFrameSendloopid);
 }
 
 - (void)startFrameSendLoopWith:(int)loopid {
@@ -678,6 +676,9 @@
 }
 
 - (void)backGroundFrameSendLoopStart:(int)loopid {
+    if (!_backGroundFrameSendloopOn) {
+        NSLog(@"should be closed=id===%d,  now loopid ==%d", loopid, _backGroundFrameSendloopid);
+    }
     if (_backGroundFrameSendloopid != loopid) {
         return;
     }
@@ -689,7 +690,7 @@
             [_rtmpStreamer pushPixelBuffer:_backGroundPixBuffer];
         }
         
-        [UPLiveSDKLogger log:@"UPAVCapturer.backGroundFrameSendLoopStart" level:UP_Level_error tag:UP_Tag_event];
+        [UPLiveSDKLogger log:[NSString stringWithFormat:@"UPAVCapturer.backGroundFrameSendLoopStart==loopid=%d", loopid] level:UP_Level_error tag:UP_Tag_event];
         [weakself backGroundFrameSendLoopStart:loopid];
     });
 }
@@ -719,13 +720,13 @@
         _backGroundPixBuffer = pixelBuffer_c;
     }
     
-#ifdef _UPRTCSDK_
+
     if (self.rtc.channelConnected) {
         // rtc 已经连接视频切换到 rtc 系统
         [[RtcManager sharedInstance] deliverVideoFrame:pixelBuffer];
         return;
     }
-#endif
+
     
     //视频数据压入列发送队列
     dispatch_sync(_pushFrameQueue, ^{
@@ -745,12 +746,12 @@
 
 - (void)didCaptureAudioBuffer:(AudioBuffer)audioBuffer withInfo:(AudioStreamBasicDescription)asbd{
     
-#ifdef _UPRTCSDK_
+
     if (self.rtc.channelConnected) {
         // rtc 已经连接音频切换到 rtc 系统
         return;
     }
-#endif
+
     //音频数据压缩入列发送队列
     dispatch_sync(_pushFrameQueue, ^{
         typedef struct AudioBuffer  AudioBuffer;
@@ -769,53 +770,52 @@
 
 
 - (void)rtcInitWithAppId:(NSString *)appid {
-#ifdef _UPRTCSDK_
+
     self.rtc = [RtcManager sharedInstance];
     self.rtc.delegate = self;
     [self.rtc setAppId:appid];
     [UPLiveSDKLogger log:@"UPAVCapturer.连麦模块 InitWithAppId" level:UP_Level_debug tag:UP_Tag_event];
 
-#endif
+
 }
 
 - (void)rtcSetViewMode:(int)mode {
-#ifdef _UPRTCSDK_
+
     [self.rtc setViewMode:mode];
-#endif
+
 }
 
 - (UIView *)rtcRemoteView0WithFrame:(CGRect)frame{
-#ifdef _UPRTCSDK_
+
     self.rtc.remoteView0.frame = frame;
     return self.rtc.remoteView0;
-#endif
+
 }
 
 - (UIView *)rtcRemoteView1WithFrame:(CGRect)frame{
-#ifdef _UPRTCSDK_
+
     self.rtc.remoteView1.frame = frame;
     return self.rtc.remoteView1;
-#endif
+
 }
 
 - (int)rtcConnect:(NSString *)channelId{
-#ifdef _UPRTCSDK_
+
     [_audioUnitRecorder stop];
     if (![self trySetRtcInputVideoSize]) {
         [UPLiveSDKLogger log:@"UPAVCapturer.连麦错误：请检查 appID 及 采集视频尺寸" level:UP_Level_error tag:UP_Tag_event];
         return -2;
     }
+    if (self.audioOnly) {
+        [self.rtc muteLocalVideoStream:YES];
+    }
     
     [self.rtc startWithRtcChannel:channelId];
     return 0;
-#else
-    [UPLiveSDKLogger log:@"UPAVCapturer.连麦需要安装连麦模块" level:UP_Level_error tag:UP_Tag_event];
-    return -1;
-#endif
 }
 
 - (void)rtcClose {
-#ifdef _UPRTCSDK_
+
     
     [UPLiveSDKLogger log:@"UPAVCapturer.rtcClose" level:UP_Level_debug tag:UP_Tag_event];
     [self.rtc stop];
@@ -831,7 +831,7 @@
             [UPLiveSDKLogger log:@"UPAVCapturer._audioUnitRecorder start" level:UP_Level_debug tag:UP_Tag_event];
         }
     });
-#endif
+
 }
 
 - (int)rtcMuteLocalAudioStream:(BOOL)mute {
@@ -851,8 +851,6 @@
 }
 
 
-#ifdef _UPRTCSDK_
-
 - (BOOL)trySetRtcInputVideoSize{
     int w = _upVideoCapture.capturerPresetLevelFrameCropSize.width;
     int h = _upVideoCapture.capturerPresetLevelFrameCropSize.height;
@@ -870,7 +868,7 @@
 }
 
 -(void)rtc:(RtcManager *)manager didReceiveVideoBuffer:(CVPixelBufferRef)pixelBuffer {
-    if(!_applicationActive){
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateBackground){
         //应用进入了后台
         return;
     }
@@ -939,9 +937,6 @@
         }
     });
 }
-
-#endif
-
 
 
 #pragma mark auto reconnnection
