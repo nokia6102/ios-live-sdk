@@ -194,7 +194,7 @@
     CGRect frame0 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10, w, h);
     CGRect frame1 = CGRectMake([UIScreen mainScreen].bounds.size.width - w - 10, 10 + h, w, h);
 
-    [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
+    [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"6b1f80e7ea8b1752424f85329a4faff5900d"];
     [[UPAVCapturer sharedInstance] rtcSetViewMode:0];//主播模式连麦
 
     self.rtcRemoteView0 = [[UPAVCapturer sharedInstance] rtcRemoteView0WithFrame:frame0];//显示第一个连麦嘉宾画面

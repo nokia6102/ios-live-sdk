@@ -391,7 +391,7 @@
         _rtcContainerView.backgroundColor = [UIColor blackColor];
         [self.view insertSubview:_rtcContainerView belowSubview:_rtcBtn];
         
-        [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"be0c14467694a1194adab41370cbed5b2fb6"];
+        [[UPAVCapturer sharedInstance] rtcInitWithAppId:@"6b1f80e7ea8b1752424f85329a4faff5900d"];
         [[UPAVCapturer sharedInstance] rtcSetViewMode:1];//观众连麦模式
         self.rtcRemoteView0 = [[UPAVCapturer sharedInstance] rtcRemoteView0WithFrame:frame_main];//显示主播画面
         self.rtcRemoteView1 = [[UPAVCapturer sharedInstance] rtcRemoteView1WithFrame:frame1];//显示另外一个连麦嘉宾画面
