@@ -227,7 +227,7 @@ __注:__ ``UPLiveSDKDll.framework``中的推流器 `UPAVStreamer`也可以单独
 
 __[注]__  如果需要在产品中正式使用连麦功能，请联系申请 ``` rtc appid ```, 可以参考 ``` README_rtc.md ``` 熟悉连麦直播流程。
 
-
+__[注]__  纯音频推流与连麦, 只需要在连麦或推流时设置 `[UPAVCapturer sharedInstance].audioOnly = YES;` 即可
 
 ## 6 版本历史 
 
