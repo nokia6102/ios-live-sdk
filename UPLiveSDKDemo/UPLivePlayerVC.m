@@ -48,7 +48,7 @@
 @implementation UPLivePlayerVC
 
 - (void)viewDidLoad {
-    [UPLiveSDKConfig setLogLevel:UP_Level_error];
+    [UPLiveSDKConfig setLogLevel:UP_Level_debug];
     [UPLiveSDKConfig setStatistcsOn:YES];
 
     self.view.backgroundColor = [UIColor blackColor];
@@ -122,6 +122,7 @@
 - (void)stop:(id)sender {
     [_player stop];
 }
+
 - (void)pause:(id)sender {
     [_player pause];
 }
@@ -151,7 +152,8 @@
 
 - (void)updateDashboard{
     
-    NSMutableString *string = [NSMutableString new];
+    
+NSMutableString *string = [NSMutableString new];
     [string appendString:[NSString stringWithFormat:@"url: %@ \n", _player.dashboard.url]];
     [string appendString:[NSString stringWithFormat:@"serverName: %@ \n", _player.dashboard.serverName]];
     [string appendString:[NSString stringWithFormat:@"serverIp: %@ \n", _player.dashboard.serverIp]];

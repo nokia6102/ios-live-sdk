@@ -24,6 +24,8 @@ typedef NS_ENUM(NSInteger, UPAudioUnitCategory) {
 @property (nonatomic, weak) id<UPAudioCaptureProtocol> delegate;
 @property (nonatomic) int increaserRate;// 0静音 － 100原声 － 200两倍音量增益
 @property (nonatomic) BOOL deNoise;
+@property (nonatomic) int bgmPlayerType;
+
 
 
 

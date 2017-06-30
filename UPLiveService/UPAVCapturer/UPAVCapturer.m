@@ -14,9 +14,7 @@
 #import "LFGPUImageBeautyFilter.h"
 #import <UPLiveSDKDll/UPLiveSDKLogger.h>
 #import <UPLiveSDKDll/UPLiveSDKConfig.h>
-
-
-//连麦模块可先择集成
+#import "AudioMonitorPlayer.h"
 
 
 @interface UPAVCapturer()<RtcManagerDataOutProtocol>
@@ -40,6 +38,7 @@
     UIView *_preview;
     NSString *_outStreamPath;
     NSMutableArray *_autoReconnectionLogs;
+    AudioMonitorPlayer *_audioMonitorPlayer;
     
 }
 
@@ -159,6 +158,7 @@
         _timeSec = 30;
         _reconnectCount = 0;
         _autoReconnectionLogs = [[NSMutableArray alloc] init];//记录重连事件
+        _audioMonitorPlayer = [[AudioMonitorPlayer alloc] init];
     }
     return self;
 }
@@ -452,6 +452,14 @@
         [_upVideoCapture start];
     }
     [_audioUnitRecorder start];
+    
+    
+    BOOL audioMonitorTestOn = NO;
+    if (audioMonitorTestOn) {
+        _audioUnitRecorder.bgmPlayerType = -1;
+        [_audioMonitorPlayer start];
+    }
+    
     self.capturerStatus = UPAVCapturerStatusLiving;
     
 #ifndef UPYUN_APP_EXTENSIONS
@@ -471,6 +479,9 @@
     
     //关闭视频采集
     [_upVideoCapture stop];
+    
+    //关闭反听
+    [_audioMonitorPlayer stop];
 
     //关闭音频采集
     [_audioUnitRecorder stop];
@@ -744,23 +755,26 @@
     });
 }
 
-- (void)didCaptureAudioBuffer:(AudioBuffer)audioBuffer withInfo:(AudioStreamBasicDescription)asbd{
-    
 
+- (void)didCaptureAudioBuffer:(AudioBuffer)audioBuffer withInfo:(AudioStreamBasicDescription)asbd{
     if (self.rtc.channelConnected) {
         // rtc 已经连接音频切换到 rtc 系统
         return;
     }
-
+    
+    //反听功能，反耳功能
+    if (self.capturerStatus == UPAVCapturerStatusLiving) {
+        [_audioMonitorPlayer renderAudioBuffer:audioBuffer info:asbd];
+    }
+    
     //音频数据压缩入列发送队列
     dispatch_sync(_pushFrameQueue, ^{
-        typedef struct AudioBuffer  AudioBuffer;
+        
         if (self.audioMute) {
             if (audioBuffer.mData) {
                 memset(audioBuffer.mData, 0, audioBuffer.mDataByteSize);
             }
         }
-        
         if (_streamingOn) {
             [_rtmpStreamer pushAudioBuffer:audioBuffer info:asbd];
         }

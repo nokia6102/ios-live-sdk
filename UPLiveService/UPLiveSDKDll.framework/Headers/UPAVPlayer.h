@@ -101,6 +101,7 @@ willRenderBuffer:(AudioBufferList *)audioBufferList
 @property (nonatomic, assign) CGFloat volume;
 @property (nonatomic, assign) CGFloat bright;
 @property (nonatomic, assign) BOOL mute;
+@property (nonatomic, assign) int type;
 
 @property (nonatomic, assign) NSTimeInterval timeoutForBuffering;//视频缓冲超时，默认 60s
 @property (nonatomic, assign) NSTimeInterval timeoutForOpenFile;//打开文件超时，默认 10s
@@ -109,10 +110,11 @@ willRenderBuffer:(AudioBufferList *)audioBufferList
 @property (nonatomic, copy) NSString *url;
 @property (nonatomic, assign, readonly) float displayPosition;//视频播放到的时间点
 @property (nonatomic, assign, readonly) float streamPosition;//视频流读取到的时间点
+@property (nonatomic, assign, readonly) float audioPosition;//音频播放到的时间点
+
 @property (nonatomic, weak) id<UPAVPlayerDelegate> delegate;
 @property (nonatomic) BOOL lipSynchOn;//音画同步，默认值 YES
-
-
+@property (nonatomic) int lipSynchMode;//0：音频向视频同步, 视频向标准时间轴同步；1：视频向音频同步，音频按照原采样率连续播放。 默认值 为 1。
 
 - (instancetype)initWithURL:(NSString *)url;
 - (void)setFrame:(CGRect)frame;

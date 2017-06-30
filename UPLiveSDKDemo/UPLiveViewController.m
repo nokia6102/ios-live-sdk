@@ -11,6 +11,7 @@
 #import "UPLiveStreamerDemoViewController.h"
 
 
+
 @interface UPLiveViewController ()
 
 @end
@@ -27,17 +28,33 @@
     [playerBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [playerBtn setTitle:@"播放器示例" forState:UIControlStateNormal];
     
-    
     UIButton *streamerBtn = [[UIButton alloc] initWithFrame:CGRectMake(100, 250, 100, 100)];
     [streamerBtn addTarget:self action:@selector(streamerBtn:) forControlEvents:UIControlEventTouchUpInside];
     [streamerBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [streamerBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [streamerBtn setTitle:@"推流器示例" forState:UIControlStateNormal];
     
-    
+    /*
+     UIButton *videoBtn = [[UIButton alloc] initWithFrame:CGRectMake(100, 350, 100, 100)];
+     [videoBtn addTarget:self action:@selector(videoBtn:) forControlEvents:UIControlEventTouchUpInside];
+     [videoBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+     [videoBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+     [videoBtn setTitle:@"录制示例" forState:UIControlStateNormal];
+     
+     */
+
     [self.view addSubview:playerBtn];
     [self.view addSubview:streamerBtn];
 }
+
+/*
+ - (void)videoBtn:(UIButton *)button {
+ UPVideoVC *vc = [UPVideoVC new];
+ vc.title = @"录制";
+ vc.view.backgroundColor = [UIColor whiteColor];
+ [self.navigationController pushViewController:vc animated:YES];
+ }
+ */
 
 - (void)playerBtn:(UIButton *)sender {
     UPLivePlayerDemoViewController *vc = [UPLivePlayerDemoViewController new];

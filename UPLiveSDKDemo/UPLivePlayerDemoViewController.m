@@ -50,24 +50,29 @@
     /* test urls
      http://test86400.b0.upaiyun.com/7937144.mp4
      rtmp://live.hkstv.hk.lxdns.com/live/hks
+     http://test86400.b0.upaiyun.com/shanqiu.mp3
      http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8
      http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/gear1/prog_index.m3u8
      rtmp://testlivesdk.b0.upaiyun.com/live/test196
      http://test654123.b0.upaiyun.com/265_demo.mp4 h265 hevc 格式
-     http://test86400.b0.upaiyun.com/shanqiu.mp3
      rtmp://leyulive.pull.iemylife.com/leyu/test3
      http://test86400.b0.upaiyun.com/flv/2016_08_15_16_28_20_853_%2B0800.flv
      http://upyun-live-recorder.b0.upaiyun.com/live.ecook.cn/live/2/recorder20160812202528.mp4
      http://upyun-live-recorder.b0.upaiyun.com/live.ecook.cn/live/2/recorder20160812202528.mp4
      http://wz.loongscity.com/test1482724992.mp4
+     http://pl.youku.com/playlist/m3u8?vid=XMTc1MTM3MzEwNA%3D%3D&ts=1486397000&ctype=12&token=0504&keyframe=0&sid=048639699981012665ea0&ev=1&type=mp4&ep=ciacHEqEUMcJ7CveiD8bYSrnISYPXJZ3kkyE%2FLYfA8ZuPa%2FB6DPcqJ21Tvs%3D&oip=1998603676
+     
+     
+     http://goldfish-qingdao.oss-cn-qingdao.aliyuncs.com/%E7%8E%B0%E8%B4%A7%E5%AD%A6%E5%A0%8201%E2%80%94%E4%BB%80%E4%B9%88%E6%98%AF%E5%A4%A7%E5%AE%97%E5%95%86%E5%93%81.mp4
      */
     
+//    textFieldPlayUrl.text = @"http://test86400.b0.upaiyun.com/recorder20170617182058.mp4";
     textFieldPlayUrl.text = @"rtmp://live.hkstv.hk.lxdns.com/live/hks";
+    
     textFieldPlayUrl.borderStyle = UITextBorderStyleRoundedRect;
     textFieldPlayUrl.font = [UIFont systemFontOfSize:12.0f];
     textFieldPlayUrl.clearButtonMode = UITextFieldViewModeWhileEditing;
     textFieldPlayUrl.returnKeyType = UIReturnKeyDone;
-
 
     [self.view addSubview:label];
     [self.view addSubview:textFieldPlayUrl];

@@ -89,7 +89,7 @@
     [self.view insertSubview:self.videoPreview atIndex:0];
     
     //开启 debug 信息
-    [UPLiveSDKConfig setLogLevel:UP_Level_debug];
+    [UPLiveSDKConfig setLogLevel:UP_Level_error];
     [UPLiveSDKConfig setStatistcsOn:YES];
 
     //设置代理，采集状态推流信息回调
@@ -210,9 +210,6 @@
         NSString *rtcChannelId = _settings.streamId;
         int ret = [[UPAVCapturer sharedInstance] rtcConnect:rtcChannelId];
         
-        if (ret == -1) {
-            [self errorAlert:@"连麦功能需要安装连麦模块：UPRtcSDK.framework"];
-        }
         if (ret == -2) {
             [self errorAlert:@"连麦错误：请检查 appID 及 采集视频尺寸"];
         }
@@ -236,7 +233,7 @@
 
 - (IBAction)mixerSwitch:(UISwitch *)sender {
     
-    [UPAVCapturer sharedInstance].backgroudMusicUrl = @"http://test86400.b0.upaiyun.com/music1.mp3";
+    [UPAVCapturer sharedInstance].backgroudMusicUrl = @"http://test86400.b0.upaiyun.com/music32000.mp3";
     [UPAVCapturer sharedInstance].backgroudMusicOn = ![UPAVCapturer sharedInstance].backgroudMusicOn;
 }
 

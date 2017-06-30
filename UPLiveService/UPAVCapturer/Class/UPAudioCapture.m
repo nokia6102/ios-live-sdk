@@ -60,6 +60,7 @@ static float UPAudioCapture_gain(float db) {
     BOOL _asbdBus0Set;
     dispatch_queue_t _queue;
     BOOL _audioCapturIsWorking;
+    double _sampleRate;
 
 }
 @property (nonatomic) AudioComponentInstance audioUnit;
@@ -180,6 +181,7 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
     
     self = [super init];
     if (self) {
+        _sampleRate = samplerate;
         [self setupAudioSession];
         _pcmProcessor = [[AudioProcessor alloc] initWithNoiseSuppress:-7 samplerate:samplerate];
         _mixerInputPcmPoolForBus0 = [NSMutableData new];
@@ -268,7 +270,7 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
     _bgmPlayer = [[UPAVPlayer alloc] initWithURL:nil];
     _bgmPlayer.delegate = self;
     _bgmPlayer.url = _backgroudMusicUrl;
-
+    _bgmPlayer.type = self.bgmPlayerType;
 }
 
 - (void)setBackgroudMusicVolume:(Float32)backgroudMusicVolume {
@@ -292,10 +294,9 @@ static OSStatus audioPlaybackCallback(void *inRefCon,
         NSLog(@"session setMode error %@", error);
     }
     
-    double sampleRate = 32000.0;
     NSError *audioSessionError = nil;
     
-    success = [session setPreferredSampleRate:sampleRate error:&audioSessionError];
+    success = [session setPreferredSampleRate:_sampleRate error:&audioSessionError];
     
     if (success) {
     } else {
