@@ -236,7 +236,7 @@
             [self.delegate capturer:self pushStreamStatusDidChange:_pushStreamStatus];
         }
         
-        switch (_pushStreamStatus) {
+        switch (pushStreamStatus) {// 原全局变量 _pushStreamStatus，会引起连续两次重连，引发失败
             case UPPushAVStreamStatusClosed:{
                 if (!self.delegate ) {
                     //代理可能提前销毁了，在这里提示一下推流结束.
