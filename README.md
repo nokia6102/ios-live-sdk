@@ -4,11 +4,8 @@
 
 ## 1 SDK 概述     
 
-此 `SDK` 包含推流和拉流两部分，支持美颜滤镜、水印、连麦等全套直播功能。                
-此 `SDK` 中的播放器、采集器、推流器均可单独使用。        
-
-
-基于此 `SDK` 结合 __upyun__ 直播平台可以快速构建直播应用。
+此 ```SDK``` 包含推流和拉流两部分，支持美颜滤镜、水印、连麦等全套直播功能。     
+```50``` 行代码即可开始直播，结合 ```UPYUN直播平台``` 可以快速构建直播应用。
 
 [UPYUN 直播平台自主配置流程](http://docs.upyun.com/live/) 
 
@@ -145,44 +142,35 @@ Demo 下载: `https://github.com/upyun/ios-live-sdk`
 
 ## 5 使用示例 
 
+___具体使用示例，请参考 demo 工程的 ```基础使用示例 ```部分，```50行代码``` 即可以开启直播和播放。
+高级设置和使用请参考 demo 工程的 ```高级设置使用示例 ```部分。___
+
 ### 5.1 推流使用示例 UPAVCapturer
 
-使用__拍摄和推流__功能需要引入头文件  `#import "UPAVCapturer.h"`  
-
-`UPAVCapturer` 是采集器，采集处理后的数据会利用 `UPAVStreamer` 进行推流；
-
-	
-	
-__注:__ ``UPLiveSDKDll.framework``中的推流器 `UPAVStreamer`也可以单独使用。`UPAVStreamer`可以配合任何采集器来推流原始的或者经过编码压缩的音视频数据。
+使用**拍摄和推流**功能需要引入头文件  `#import "UPAVCapturer.h"`。`UPAVCapturer` 负责采集视频再经过 `UPAVStreamer` 进行推流直播,``UPLiveSDKDll.framework``中的推流器 `UPAVStreamer`也可以单独使用。`UPAVStreamer`可以配合任何采集器来推流原始或压缩的音视频数据。
 
 
-1.设置视频预览视图:  
+``` 
+    //1. 设置预览画面
+    UIView *livePreview = [[UPAVCapturer sharedInstance] previewWithFrame:self.view.bounds
+                                                              contentMode:UIViewContentModeScaleAspectFit];
+    //2. 将预览画面添加到 view
+    [self.view insertSubview:livePreview atIndex:0];
+    
+    //3. 设置代理，接收直播状态回调
+    [UPAVCapturer sharedInstance].delegate = self;
+    
+    //4. 设置推流地址
+    [UPAVCapturer sharedInstance].outStreamPath = [NSString stringWithFormat:@"rtmp://testlivesdk.v0.upaiyun.com/live/%@", _streamId];
+    
+    //6. 设置视频采集尺寸。其他详细设置请参考高级示例。
+    [UPAVCapturer sharedInstance].capturerPresetLevel = UPAVCapturerPreset_640x480;
+    
+    //6. 开始推流
+    [[UPAVCapturer sharedInstance] start];
 
-```
-   UIViewContentMode previewContentMode = UIViewContentModeScaleAspectFit;
-   self.videoPreview = [[UPAVCapturer sharedInstance] previewWithFrame:CGRectMake(0, 0, width, height) 
-   contentMode:previewContentMode];
-   self.videoPreview.backgroundColor = [UIColor blackColor];
-   [self.view insertSubview:self.videoPreview atIndex:0];
-
-```
-
-2.设置推流地址
-
-```
-	NSString *rtmpPushUrl = @"rtmp://host/liveapp/streamid";
-	[UPAVCapturer sharedInstance].outStreamPath = rtmpPushUrl;
-
-```
-
-3.开启和关闭  
-
-```
-	//开启视频采集并推流到 rtmpPushUrl
-	[[UPAVCapturer sharedInstance] start];
-
-	//关闭视频采集，停止推流
-	[[UPAVCapturer sharedInstance] stop];
+    //7. 结束推流
+    [[UPAVCapturer sharedInstance] stop];
 
 ```
 
@@ -193,100 +181,38 @@ __注:__ ``UPLiveSDKDll.framework``中的推流器 `UPAVStreamer`也可以单独
 
 `UPAVPlayer` 使用接口类似 `AVFoundation` 的 `AVPlayer` 。
 
-完整的使用代码请参考 `demo` 工程。
-
-     
-
-1.设置播放地址
-
 ```
-    //初始化播放器，设置播放地址
+    //1. 初始化播放器
     _player = [[UPAVPlayer alloc] initWithURL:@"rtmp://live.hkstv.hk.lxdns.com/live/hks"];
-
-    //设置播放器画面尺寸
-    [_player setFrame:[UIScreen mainScreen].bounds];
     
-    //将播放器画面添加到 UIview上展示
+    //2. 设置代理，接收状态回调信息
+    _player.delegate = self;
+    
+    //3. 设置播放器 playView Frame
+    [_player setFrame:self.view.bounds];
+    
+    //4. 添加播放器 playView
     [self.view insertSubview:_player.playView atIndex:0];
+    
+    //5. 开始播放
+    [_player play];
+
+    //6. 停止播放
+    [_player stop];
 
 ```
 
-2.连接、播放、暂停、停止、seek  
+__[注1]__  如果需要在产品中正式使用连麦功能，请联系申请 ``` rtc appid ```, 可以参考 ``` README_rtc.md ``` 熟悉连麦直播流程。
 
-```
-- (void)connect;//连接文件或视频流。
-- (void)play;//开始播放。如果流文件未连接会自动连接视频流。
-- (void)pause;//暂停播放。直播流无法暂停。
-- (void)stop;//停止播放且关闭视频流。
-- (void)seekToTime:(CGFloat)position;//seek 到固定播放点。直播流无法 seek。
+__[注2]__  单音频推流与连麦, 只需要在连麦或推流时设置 ```[UPAVCapturer sharedInstance].audioOnly = YES;``` 即可。
 
-```
+__[注3]__  可以通过 ```[UPAVCapturer sharedInstance].streamingOn``` 开关，来实现先预览再推流的逻辑。
 
 
-
-
-__[注]__  如果需要在产品中正式使用连麦功能，请联系申请 ``` rtc appid ```, 可以参考 ``` README_rtc.md ``` 熟悉连麦直播流程。
-
-__[注]__  纯音频推流与连麦, 只需要在连麦或推流时设置 `[UPAVCapturer sharedInstance].audioOnly = YES;` 即可
 
 ## 6 版本历史 
 
-__4.0.0  改为动态库，连麦功能完善。 建议更新 2017.02.06__  
-
-
-* 修改为动态库，以避免 ffmpeg 冲突       
-* 集成连麦模块，支持三人连麦的详细 demo    
-* 修复自动重连，来电打断等 bug 
-* __[注意]__ 需要新添加几个系统依赖（用于连麦功能，参考: _工程依赖_）     
-* __[注意]__ 需要添加 Embedded Binaries（动态库，参考: _工程设置_）
-
-  
-
-     			       
-__3.1 三人连麦: 2016.12.08__  			
-
-__3.0 支持直播连麦__  __更新建议: 建议更新, 2016.11.10__                   
-
-__2.9 增加动态码率__  __更新建议: 建议更新, 2016.11.3__
-
-* 增加 动态码率功能 (开启方法: `[UPAVCapturer sharedInstance].openDynamicBitrate = YES`)
-* bug fix
-
-__2.8 增加新推流分辨率,修复BUG__  __更新建议: 可以更新, 2016.10.27__
-
-* 增加 960X540 推流分辨率,
-* 修复推流状态回调不及时的 BUG 
-
-__2.7 增加直播混音功能__  __更新建议: 建议更新, 2016.10.14__
-
-* 播放器新加实时播放 `PCM` 数据的接口，可用于混音或者音频可视化
-* 音频采集模块升级为 `AudioGraph` 实现，新加混音接口, 可实现类似映客的唱歌功能
-* `Swift` 适配, 可以在 `Swift` 工程直接使用 `UPLiveSDKDll.framework`.
-* __[注意]__  `UPAVPlayerDelegate`、`UPAVStreamerDelegate`、`UPAVCapturerDelegate` 方法名变动.
-* bug fix 
-
-__2.6 bug 修复__  __更新建议: 建议更新, 2016.9.22__
-
-__2.5 降噪功能优化__   __更新建议: 非强制性, 如果对环境噪音要求比较高的可以更新__
-
-__2.4 降噪功能__
-
-__2.3 单音频推流__
-
-__2.2 采集部分以源码展示__        
-
-* 采集模块开源（包含音视频采集，GpuImage 处理，混音相关代码）
-
-
-__2.1 包尺寸显著减小；支持后台推流；支持浏览器 Flex 推流的播放__
-
-__1.0.4 分析统计，拆分 UPAVStreamer__
- 	
-__1.0.3 点播支持__
-
-__1.0.2 性能优化，添加美颜滤镜__
- 	
-__1.0.1 基本的直播推流器和播放器；__  
+[历史版本：https://github.com/upyun/ios-live-sdk/releases](https://github.com/upyun/ios-live-sdk/releases)
  
 ## 7 反馈与建议
 
