@@ -48,7 +48,7 @@
 @implementation UPLivePlayerVC
 
 - (void)viewDidLoad {
-    [UPLiveSDKConfig setLogLevel:UP_Level_debug];
+    [UPLiveSDKConfig setLogLevel:UP_Level_error];
     [UPLiveSDKConfig setStatistcsOn:YES];
 
     self.view.backgroundColor = [UIColor blackColor];
@@ -310,10 +310,10 @@ NSMutableString *string = [NSMutableString new];
 - (void)player:(id)player playerError:(NSError *)error {
     [self.activityIndicatorView stopAnimating];
     self.bufferingProgressLabel.hidden = YES;
-    NSString *msg = @"请重新尝试播放.";
     if (error) {
-        NSLog(@"%@", error.description);
+        NSLog(@"playerError: %@", error);
     }
+    NSString *msg = [NSString stringWithFormat:@"请重新尝试播放. %@", error.localizedDescription];
     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"播放失败!"
                                                                    message:msg
                                                             preferredStyle:UIAlertControllerStyleAlert];

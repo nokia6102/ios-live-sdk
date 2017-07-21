@@ -89,7 +89,7 @@
     [self.view insertSubview:self.videoPreview atIndex:0];
     
     //开启 debug 信息
-    [UPLiveSDKConfig setLogLevel:UP_Level_error];
+    [UPLiveSDKConfig setLogLevel:UP_Level_debug];
     [UPLiveSDKConfig setStatistcsOn:YES];
 
     //设置代理，采集状态推流信息回调
