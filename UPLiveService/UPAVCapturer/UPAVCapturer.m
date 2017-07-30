@@ -1037,20 +1037,6 @@
 }
 
 #pragma mark upyun token
-+ (NSString *)tokenWithKey:(NSString *)key
-                    bucket:(NSString *)bucket
-                expiration:(int)expiration
-           applicationName:(NSString *)appName
-                streamName:(NSString *)streamName {
-    NSTimeInterval expiration_ = [[NSDate date] timeIntervalSince1970];
-    NSString *input = [NSString stringWithFormat:@"%@&%d&/%@/%@", key, (int)expiration_ + expiration, appName, streamName];
-    NSString *md5string = [UPAVCapturer md5:input];
-    if (md5string.length != 32) {
-        return nil;
-    }
-    NSString *token = [NSString stringWithFormat:@"%@%d", [md5string substringWithRange:NSMakeRange(12, 8)], (int)expiration_ + expiration];
-    return token;
-}
 
 + (NSString *)md5:(NSString *)input {
     const char *cStr = [input UTF8String];

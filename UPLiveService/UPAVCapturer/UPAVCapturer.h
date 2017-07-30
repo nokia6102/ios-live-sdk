@@ -178,20 +178,6 @@ typedef void(^NetworkStateBlock)(UPAVStreamerNetworkState level);
 
 
 
-/*** 生成推流 token
- 例如推流地址：rtmp://bucket.v0.upaiyun.com/live/abc?_upt=abcdefgh1370000600
- 其中：
- bucket 为 bucket name；
- live 为 appName；
- abc 为 streamName；
- abcdefgh1370000600 为推流token 可以用此方法计算生成。
- ****/
-+ (NSString *)tokenWithKey:(NSString *)key //空间密钥
-                    bucket:(NSString *)bucket //空间名
-                expiration:(int)expiration //token 过期时间
-           applicationName:(NSString *)appName //应用名，比如示例推流地址中的 live
-                streamName:(NSString *)streamName; //流名， 比如示例推流地址中的 abcÏ
-
 
 @end
 

@@ -73,6 +73,11 @@ typedef void(^AudioBufferListReleaseBlock)(AudioBufferList *audioBufferListe);
 - (void)player:(UPAVPlayer *)player streamStatusDidChange:(UPAVStreamStatus)streamStatus;
 - (void)player:(UPAVPlayer *)player streamInfoDidReceive:(UPAVPlayerStreamInfo *)streamInfo;
 
+//字幕流回调
+@optional
+- (void)player:(UPAVPlayer *)player subtitle:(NSString *)text atPosition:(CGFloat)position shouldDisplay:(CGFloat)duration;
+
+
 /*
  播放音频数据的回调.
  用途如：读取并播放音频文件，同时将音频数据送入混音器来当作背景音乐。

@@ -64,10 +64,11 @@
      
      
      http://goldfish-qingdao.oss-cn-qingdao.aliyuncs.com/%E7%8E%B0%E8%B4%A7%E5%AD%A6%E5%A0%8201%E2%80%94%E4%BB%80%E4%B9%88%E6%98%AF%E5%A4%A7%E5%AE%97%E5%95%86%E5%93%81.mp4
+     
+     http://sf-seven.b0.upaiyun.com/Game.of.Thrones.S07E01.Dragonstone.1080p.AMZN.WEB-DL.DDP5.1.H.264-GoT.mkv
      */
     
-//    textFieldPlayUrl.text = @"http://test86400.b0.upaiyun.com/recorder20170617182058.mp4";
-    textFieldPlayUrl.text = @"rtmp://live.hkstv.hk.lxdns.com/live/hks";
+    textFieldPlayUrl.text = @"http://test86400.b0.upaiyun.com/7937144.mp4";
     
     textFieldPlayUrl.borderStyle = UITextBorderStyleRoundedRect;
     textFieldPlayUrl.font = [UIFont systemFontOfSize:12.0f];

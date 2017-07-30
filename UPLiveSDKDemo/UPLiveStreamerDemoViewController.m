@@ -140,27 +140,12 @@
     [self updateUI];
 }
 - (void)updateUI {
-    //计算 upToken
-    NSString *upToken = [UPAVCapturer tokenWithKey:@"password"
-                                            bucket:@"testlivesdk"
-                                        expiration:86400
-                                   applicationName:_settings.rtmpServerPushPath.lastPathComponent
-                                        streamName:_settings.streamId];
-    
-    
-    textViewPushUrl.text = [NSString stringWithFormat:@"%@%@?_upt=%@", self.settings.rtmpServerPushPath, self.settings.streamId, upToken];
+    textViewPushUrl.text = [NSString stringWithFormat:@"%@%@", self.settings.rtmpServerPushPath, self.settings.streamId];
     NSURL *url = [NSURL URLWithString:self.settings.rtmpServerPlayPath relativeToURL:nil];
 
-    NSString *rtmpPlayUrl = [NSString stringWithFormat:@"rtmp://%@/%@/%@?_upt=%@", url.host, _settings.rtmpServerPushPath.lastPathComponent,self.settings.streamId, upToken];
-    
-    
-    upToken = [UPAVCapturer tokenWithKey:@"password"
-                                  bucket:@"testlivesdk"
-                              expiration:86400
-                         applicationName:_settings.rtmpServerPushPath.lastPathComponent
-                              streamName:[NSString stringWithFormat:@"%@.m3u8", self.settings.streamId]];
+    NSString *rtmpPlayUrl = [NSString stringWithFormat:@"rtmp://%@/%@/%@", url.host, _settings.rtmpServerPushPath.lastPathComponent,self.settings.streamId];
 
-    NSString *hlsPlayUrl = [NSString stringWithFormat:@"http://%@/%@/%@.m3u8?_upt=%@", url.host, _settings.rtmpServerPushPath.lastPathComponent,self.settings.streamId, upToken];
+    NSString *hlsPlayUrl = [NSString stringWithFormat:@"http://%@/%@/%@.m3u8", url.host, _settings.rtmpServerPushPath.lastPathComponent,self.settings.streamId];
     textViewPlayUrl.text = [NSString stringWithFormat:@"%@ \n%@", rtmpPlayUrl, hlsPlayUrl];
     
     textFieldStreamId.text = _settings.streamId;

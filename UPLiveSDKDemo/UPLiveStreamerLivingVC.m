@@ -122,14 +122,8 @@
 
     //推流地址
     NSString *rtmpPushUrl = [NSString stringWithFormat:@"%@%@", _settings.rtmpServerPushPath, _settings.streamId];
-    //计算 upToken
-    NSString *upToken = [UPAVCapturer tokenWithKey:@"passwork"
-                                            bucket:@"bucket"
-                                        expiration:86400
-                                   applicationName:_settings.rtmpServerPushPath.lastPathComponent
-                                        streamName:_settings.streamId];
     
-    rtmpPushUrl = [NSString stringWithFormat:@"%@?_upt=%@", rtmpPushUrl, upToken];
+    rtmpPushUrl = [NSString stringWithFormat:@"%@", rtmpPushUrl];
     NSLog(@"设置推流地址: %@", rtmpPushUrl);
     [UPAVCapturer sharedInstance].outStreamPath = rtmpPushUrl;
     

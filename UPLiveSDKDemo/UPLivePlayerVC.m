@@ -20,7 +20,7 @@
     UPAVPlayer *_player;
     UIActivityIndicatorView *_activityIndicatorView;
     UILabel *_bufferingProgressLabel;
-    BOOL _sliding;
+    BOOL _isSeeking;
     BOOL _rtcConnected;//是否已连麦
     UIView *_rtcContainerView;
     BOOL _landscape;//横竖屏切换
@@ -100,10 +100,8 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-
     self.view.frame = [UIScreen mainScreen].bounds;
     [_player setFrame:[UIScreen mainScreen].bounds];
-
     [self.view insertSubview:_player.playView atIndex:0];
     _activityIndicatorView.center = CGPointMake(_player.playView.center.x - 30, _player.playView.center.y);
     _bufferingProgressLabel.center = CGPointMake(_player.playView.center.x + 30, _player.playView.center.y);
@@ -194,7 +192,8 @@ NSMutableString *string = [NSMutableString new];
 }
 
 -(void)progressSliderTouchDown:(UISlider *)slider{
-    _sliding = YES;
+    //手指按下的瞬间即认为开始 _isSeeking = YES。 UPAVPlayerStatusPlaying  _isSeeking = NO;
+    _isSeeking = YES;
 }
 
 -(void)progressSliderValueChanged:(UISlider *)slider{
@@ -205,7 +204,6 @@ NSMutableString *string = [NSMutableString new];
     NSLog(@"progressSliderSeekTime slider value : %.2f", slider_.value);
     if (_player) {
         [_player seekToTime:slider_.value];
-        _sliding = NO;
     }
 }
 
@@ -272,6 +270,7 @@ NSMutableString *string = [NSMutableString new];
         }
             break;
         case UPAVPlayerStatusPlaying:{
+            _isSeeking = NO;
             NSLog(@"播放中－－－－－");
             [self.activityIndicatorView stopAnimating];
             self.bufferingProgressLabel.hidden = YES;
@@ -291,16 +290,31 @@ NSMutableString *string = [NSMutableString new];
 
 - (void)player:(id)player streamInfoDidReceive:(UPAVPlayerStreamInfo *)streamInfo {
     if (streamInfo.canPause && streamInfo.canSeek) {
+        //判别为点播
         _playProgressSlider.enabled = YES;
         _playProgressSlider.maximumValue = streamInfo.duration;
         NSLog(@"streamInfo.duration %f", streamInfo.duration);
     } else {
+        //判别为直播流
         _playProgressSlider.enabled = NO;
+    }
+    NSArray *video = [streamInfo.descriptionInfo objectForKey:@"video"];
+    if (video.count > 0) {
+        NSLog(@"视频流: %@", video);
+    }
+    NSArray *audio = [streamInfo.descriptionInfo objectForKey:@"audio"];
+    if (audio.count > 0) {
+        NSLog(@"音频流: %@", audio);
+    }
+    NSArray *subtitles = [streamInfo.descriptionInfo objectForKey:@"subtitles"];
+    if (subtitles.count > 0) {
+        NSLog(@"字幕流: %@", subtitles);
     }
 }
 
 - (void)player:(id)player displayPositionDidChange:(float)position {
-    if (_sliding) {
+    if (_isSeeking) {
+        //seek 进行中
         return;
     }
     _playProgressSlider.value = position;
@@ -327,6 +341,11 @@ NSMutableString *string = [NSMutableString new];
 
 - (void)player:(id)player bufferingProgressDidChange:(float)progress {
     self.bufferingProgressLabel.text = [NSString stringWithFormat:@"%.0f %%", (progress * 100)];
+}
+
+//字幕流回调
+- (void)player:(UPAVPlayer *)player subtitle:(NSString *)text atPosition:(CGFloat)position shouldDisplay:(CGFloat)duration {
+    NSLog(@"===== %f %f %@", position, duration, text);
 }
 
 - (void)rtcStart:(UIButton *)sender {
