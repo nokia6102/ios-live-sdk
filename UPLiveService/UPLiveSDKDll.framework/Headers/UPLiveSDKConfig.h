@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define UPLiveSDK_Version @"4.1.0"
+#define UPLiveSDK_Version @"4.1.6"
 
 typedef NS_ENUM(NSInteger, UPLiveSDKLogger_level) {
     UP_Level_debug,
