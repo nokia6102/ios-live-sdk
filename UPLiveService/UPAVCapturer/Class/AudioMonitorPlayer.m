@@ -414,6 +414,7 @@ static OSStatus renderCallback (void *inRefCon,
     }
     
     NSLog(@"dealloc  %@", self);
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 @end
 

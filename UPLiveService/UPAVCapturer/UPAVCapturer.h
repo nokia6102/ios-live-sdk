@@ -33,6 +33,7 @@ typedef NS_ENUM(NSInteger, UPPushAVStreamStatus) {
 
 typedef void(^NetworkStateBlock)(UPAVStreamerNetworkState level);
 
+
 @interface UPAVCapturerDashboard: NSObject
 @property (nonatomic, readonly) float fps_capturer;
 @property (nonatomic, readonly) float fps_streaming;
@@ -124,11 +125,16 @@ typedef void(^NetworkStateBlock)(UPAVStreamerNetworkState level);
 /// 动态码率
 @property (nonatomic, assign) BOOL openDynamicBitrate;
 
+///手机进入后台之后，画面默认显示文字“后台推流”。
+@property (nonatomic, strong) NSString *markTextForBackGroundPush;
+
 + (UPAVCapturer *)sharedInstance;
 - (UIView *)previewWithFrame:(CGRect)frame contentMode:(UIViewContentMode)mode;
 - (void)start;
 - (void)stop;
 
+//截图
+- (void)shotPhoto:(void(^)(UIImage *photo))completion;
 
 
 /****** 连麦功能******/

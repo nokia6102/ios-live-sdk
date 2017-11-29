@@ -16,6 +16,8 @@
 #import <UPLiveSDKDll/UPLiveSDKConfig.h>
 #import "AudioMonitorPlayer.h"
 
+typedef void(^ShotPhotoCompletionBlock)(UIImage *photo);
+
 
 @interface UPAVCapturer()<RtcManagerDataOutProtocol>
 @property (nonatomic, strong) RtcManager *rtc;
@@ -29,6 +31,8 @@
     NSError *_capturerError;
 
     CVPixelBufferRef _backGroundPixBuffer;
+    
+    
     int _backGroundFrameSendloopid;
     BOOL _backGroundFrameSendloopOn;
     
@@ -40,6 +44,10 @@
     NSMutableArray *_autoReconnectionLogs;
     AudioMonitorPlayer *_audioMonitorPlayer;
     
+    
+    //拍照。 todo 连麦直播拍照
+    BOOL _needShotPhoto;
+    ShotPhotoCompletionBlock _shotPhotoCompletionBlock;
 }
 
 @property (nonatomic, assign) int pushStreamReconnectCount;
@@ -646,13 +654,16 @@
 
 - (void)didReceiveBuffer:(AudioBuffer)audioBuffer info:(AudioStreamBasicDescription)asbd {
     [self didCaptureAudioBuffer:audioBuffer withInfo:asbd];
-    if([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
-        [self startFrameSendLoopWith:_backGroundFrameSendloopid];
-    } else {
-        if (_backGroundFrameSendloopOn) {
-            [self stopFrameSendLoop];
+    
+    dispatch_async(dispatch_get_main_queue(), ^(){
+        if([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+            [self startFrameSendLoopWith:_backGroundFrameSendloopid];
+        } else {
+            if (_backGroundFrameSendloopOn) {
+                [self stopFrameSendLoop];
+            }
         }
-    }
+    });
 }
 
 #pragma mark applicationActiveSwitch
@@ -708,10 +719,18 @@
 
 #pragma mark push Capture audio/video buffer
 
+
 - (void)didCapturePixelBuffer:(CVPixelBufferRef)pixelBuffer {
     //kCVPixelFormatType_420YpCbCr8PlanarFullRange
 //    NSLog(@"PixelFormatType %@", NSStringFromCode(CVPixelBufferGetPixelFormatType(pixelBuffer)));
     
+    if (_needShotPhoto && _shotPhotoCompletionBlock) {
+        UIImage *image = [UPAVCapturer imageFromPixelBuffer:pixelBuffer];
+        _shotPhotoCompletionBlock(image);
+        _needShotPhoto = NO;
+        _shotPhotoCompletionBlock = nil;
+    }
+
     if (!_backGroundPixBuffer) {
         size_t width_o = CVPixelBufferGetWidth(pixelBuffer);
         size_t height_o = CVPixelBufferGetHeight(pixelBuffer);
@@ -726,12 +745,45 @@
         void *target = CVPixelBufferGetBaseAddress(pixelBuffer_c);
         bzero(target, dataSize_o);
         
+        EAGLContext *eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        CIContext *ciContext = [CIContext contextWithEAGLContext:eaglContext options:@{kCIContextWorkingColorSpace : [NSNull null]}];
+        
+        CGFloat scale = [[UIScreen mainScreen] scale];
+
+        NSInteger fontSize = (width_o / 360. ) * 10;
+        
+        if (fontSize < 10 ) {
+            fontSize = 10;
+        }
+        
+        UIFont *font = [UIFont fontWithName:@"Helvetica" size:fontSize];
+        NSDictionary *attributes = @{NSFontAttributeName: font,
+                                     NSForegroundColorAttributeName: [UIColor whiteColor]};
+        
+        if (!self.markTextForBackGroundPush) {
+            self.markTextForBackGroundPush = @"后台推流...";
+        }
+        NSString *text = self.markTextForBackGroundPush;
+        CGSize size = CGSizeMake(width_o / scale, height_o / scale);
+        CGSize size_font  = [text sizeWithAttributes:attributes];
+
+        UIGraphicsBeginImageContextWithOptions(size, NO, 0.0);
+        
+        [text drawAtPoint:CGPointMake(size.width / 2. - size_font.width / 2., size.height / 2.  - size_font.height / 2.) withAttributes:attributes];
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        CIImage *filteredImage = [[CIImage alloc] initWithCGImage:image.CGImage];
+        CGRect extent = [filteredImage extent];
+        [ciContext render:filteredImage
+          toCVPixelBuffer:pixelBuffer_c
+                   bounds:extent
+               colorSpace:CGColorSpaceCreateDeviceRGB()];
+        
+        _backGroundPixBuffer = pixelBuffer_c;
         CVPixelBufferUnlockBaseAddress(pixelBuffer_c, 0);
         CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
-        _backGroundPixBuffer = pixelBuffer_c;
     }
     
-
     if (self.rtc.channelConnected) {
         // rtc 已经连接视频切换到 rtc 系统
         [[RtcManager sharedInstance] deliverVideoFrame:pixelBuffer];
@@ -1035,6 +1087,25 @@
 - (void)afterTimes {
     _reconnectCount = 0;
 }
+
+- (void)shotPhoto:(void(^)(UIImage *photo))complete {
+    _needShotPhoto = YES;
+    _shotPhotoCompletionBlock = complete;
+}
+
++ (UIImage *)imageFromPixelBuffer:(CVPixelBufferRef)pixelBufferRef {
+    CIImage *ciImage = [CIImage imageWithCVPixelBuffer:pixelBufferRef];
+    CIContext *temporaryContext = [CIContext contextWithOptions:nil];
+    CGImageRef videoImage = [temporaryContext
+                             createCGImage:ciImage
+                             fromRect:CGRectMake(0, 0,
+                                                 CVPixelBufferGetWidth(pixelBufferRef),
+                                                 CVPixelBufferGetHeight(pixelBufferRef))];
+    UIImage *uiImage = [UIImage imageWithCGImage:videoImage];
+    CGImageRelease(videoImage);
+    return uiImage;
+}
+
 
 #pragma mark upyun token
 

@@ -193,7 +193,9 @@
         __weak GPUImageUIElement *weakUielement = _uielement;
         [lastFilter setFrameProcessingCompletionBlock:^(GPUImageOutput *outPut, CMTime time) {
             if (_watermarkBlock) {
-                _watermarkBlock();
+                dispatch_async(dispatch_get_main_queue(), ^(){
+                    _watermarkBlock();
+                });
             }
             [weakUielement update];
         }];
