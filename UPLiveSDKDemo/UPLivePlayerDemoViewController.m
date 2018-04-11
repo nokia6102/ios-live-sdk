@@ -50,7 +50,7 @@
     /* test urls
      http://test86400.b0.upaiyun.com/7937144.mp4
      rtmp://live.hkstv.hk.lxdns.com/live/hks
-     http://test86400.b0.upaiyun.com/shanqiu.mp3
+     http://test86400.b0.upaiyun.com/music2.mp3
      http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8
      http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/gear1/prog_index.m3u8
      rtmp://testlivesdk.b0.upaiyun.com/live/test196
